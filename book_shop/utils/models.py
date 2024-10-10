@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from users.models import CustomUser
 
 
 class Item(models.Model):
@@ -28,11 +30,16 @@ class Item(models.Model):
         return age_timedelta.days
 
     def save(self, *args, **kwargs):
+        """
+        Custom save method to track the user making changes, if available in the request.
+        """
         request = kwargs.pop("request", None)
-        if request and hasattr(request, "user"):
-            if not self.pk:
-                self.created_by = request.user
-            self.updated_by = request.user
+        user = self.get_user(request)
+
+        if user:
+            if not self.pk:  # If the object is being created
+                self.created_by = user
+            self.updated_by = user
         super().save(*args, **kwargs)
 
     def update_views(self):
@@ -44,8 +51,10 @@ class Item(models.Model):
         return f"Item created at {self.date_created}."
 
     @staticmethod
-    def get_user(kwargs):
-        request = kwargs.pop("request", None)
+    def get_user(request):
+        """
+        Helper method to retrieve user from the request object.
+        """
         if request and hasattr(request, "user"):
             return request.user
         return None

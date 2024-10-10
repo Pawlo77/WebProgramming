@@ -11,7 +11,7 @@ from .models import Author, Critic
 def reset_view_count(modeladmin, request, queryset):
     queryset.update(view_count=0)
     modeladmin.message_user(
-        request, f"{queryset.count()} people(s) were successfully reseted."
+        request, f"{queryset.count()} person(s) were successfully reset."
     )
 
 
@@ -30,7 +30,6 @@ class PopularityFilter(admin.SimpleListFilter):
         max_views = (
             Author.objects.aggregate(max_views=Max("view_count"))["max_views"] or 1
         )  # Avoid division by zero
-
         queryset = queryset.annotate(
             popularity_score=(models.F("view_count") / max_views) * 10
         )
@@ -62,6 +61,7 @@ class PublishedFilter(admin.SimpleListFilter):
             return queryset.filter(publications_count__gt=0)
         if self.value() == "not_published":
             return queryset.filter(publications_count=0)
+
         return queryset
 
 
@@ -82,6 +82,7 @@ class AwardedFilter(admin.SimpleListFilter):
             return queryset.filter(awards_count__gt=0)
         if self.value() == "not_awarded":
             return queryset.filter(awards_count=0)
+
         return queryset
 
 
@@ -100,10 +101,21 @@ class AliveFilter(admin.SimpleListFilter):
             return queryset.filter(death_date__isnull=True)
         if self.value() == "deceased":
             return queryset.filter(death_date__isnull=False)
+
         return queryset
 
 
-class CriticAdmin(admin.ModelAdmin):
+class DisplayAliveMixin:
+    """Mixin to add alive status display to admin classes."""
+
+    def display_alive(self, obj):
+        return obj.death_date is None
+
+    display_alive.short_description = "Alive"
+    display_alive.boolean = True
+
+
+class CriticAdmin(DisplayAliveMixin, admin.ModelAdmin):
     actions = [reset_view_count]
     list_display = (
         "id",
@@ -118,48 +130,23 @@ class CriticAdmin(admin.ModelAdmin):
         "expertise_area",
         AliveFilter,
         "nationality",
-        (
-            "birth_date",
-            DateRangeFilterBuilder(
-                title="Birth Date",
-            ),
-        ),
-        (
-            "death_date",
-            DateRangeFilterBuilder(
-                title="Death Date",
-            ),
-        ),
+        ("birth_date", DateRangeFilterBuilder(title="Birth Date")),
+        ("death_date", DateRangeFilterBuilder(title="Death Date")),
     )
     ordering = ("expertise_area", "last_name", "first_name", "view_count")
     readonly_fields = readonly_fields
 
     fieldsets = (
+        (None, {"fields": ("first_name", "last_name", "expertise_area")}),
         (
-            None,
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                    "expertise_area",
-                )
-            },
-        ),
-        (
-            "details",
+            "Details",
             {"fields": ("birth_date", "death_date", "nationality", "website", "photo")},
         ),
         auto_fieldset,
     )
 
-    def display_alive(self, obj):
-        return obj.death_date is None
 
-    display_alive.short_description = "Alive"
-    display_alive.boolean = True
-
-
-class AuthorAdmin(admin.ModelAdmin):
+class AuthorAdmin(DisplayAliveMixin, admin.ModelAdmin):
     actions = [reset_view_count]
     list_display = (
         "id",
@@ -177,44 +164,20 @@ class AuthorAdmin(admin.ModelAdmin):
         AwardedFilter,
         PublishedFilter,
         PopularityFilter,
-        (
-            "birth_date",
-            DateRangeFilterBuilder(
-                title="Birth Date",
-            ),
-        ),
-        (
-            "death_date",
-            DateRangeFilterBuilder(
-                title="Death Date",
-            ),
-        ),
+        ("birth_date", DateRangeFilterBuilder(title="Birth Date")),
+        ("death_date", DateRangeFilterBuilder(title="Death Date")),
     )
     ordering = ("last_name", "first_name", "view_count")
     readonly_fields = readonly_fields
 
     fieldsets = (
+        (None, {"fields": ("first_name", "last_name")}),
         (
-            None,
-            {
-                "fields": (
-                    "first_name",
-                    "last_name",
-                )
-            },
-        ),
-        (
-            "details",
+            "Details",
             {"fields": ("birth_date", "death_date", "nationality", "website", "photo")},
         ),
         auto_fieldset,
     )
-
-    def display_alive(self, obj):
-        return obj.death_date is None
-
-    display_alive.short_description = "Alive"
-    display_alive.boolean = True
 
 
 admin.site.register(Critic, CriticAdmin)

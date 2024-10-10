@@ -1,23 +1,48 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views import View
 
 from .models import Review
 
 
-class LikeView(LoginRequiredMixin, View):
-    def post(self, request, review_id):
-        review = Review.objects.get(id=review_id)
+class ReviewActionView(LoginRequiredMixin, View):
+    """Base class to handle liking and disliking a review."""
 
-        if review.has_disliked(request.user):
+    def get_review(self, review_id):
+        """Retrieve the review object or return a 404 error if not found."""
+        return get_object_or_404(Review, id=review_id)
+
+    def toggle_like(self, review, user):
+        """Toggle the like status for a review."""
+        if review.has_liked(user):
+            review.delete_like(user)
+            return False
+        else:
+            review.add_like(user)
+            return True
+
+    def toggle_dislike(self, review, user):
+        """Toggle the dislike status for a review."""
+        if review.has_disliked(user):
+            review.delete_dislike(user)
+            return False
+        else:
+            review.add_dislike(user)
+            return True
+
+
+class LikeView(ReviewActionView):
+    """View for liking a review."""
+
+    def post(self, request, review_id):
+        review = self.get_review(review_id)
+        disliked = review.has_disliked(request.user)
+
+        if disliked:
             review.delete_dislike(request.user)
 
-        if review.has_liked(request.user):
-            review.delete_like(request.user)
-            liked = False
-        else:
-            review.add_like(request.user)
-            liked = True
+        liked = self.toggle_like(review, request.user)
 
         return JsonResponse(
             {
@@ -28,19 +53,17 @@ class LikeView(LoginRequiredMixin, View):
         )
 
 
-class DislikeView(LoginRequiredMixin, View):
-    def post(self, request, review_id):
-        review = Review.objects.get(id=review_id)
+class DislikeView(ReviewActionView):
+    """View for disliking a review."""
 
-        if review.has_liked(request.user):
+    def post(self, request, review_id):
+        review = self.get_review(review_id)
+        liked = review.has_liked(request.user)
+
+        if liked:
             review.delete_like(request.user)
 
-        if review.has_disliked(request.user):
-            review.delete_dislike(request.user)
-            disliked = False
-        else:
-            review.add_dislike(request.user)
-            disliked = True
+        disliked = self.toggle_dislike(review, request.user)
 
         return JsonResponse(
             {

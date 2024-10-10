@@ -35,21 +35,12 @@ class CustomUserAdmin(UserAdmin):
         "role",
         "education",
         "is_active",
-        (
-            "date_joined",
-            DateRangeFilterBuilder(
-                title="Date Joined",
-            ),
-        ),
-        (
-            "date_of_birth",
-            DateRangeFilterBuilder(
-                title="Date of birth",
-            ),
-        ),
+        ("date_joined", DateRangeFilterBuilder(title="Date Joined")),
+        ("date_of_birth", DateRangeFilterBuilder(title="Date of Birth")),
     )
     ordering = ("-date_joined", "id")
     readonly_fields = ("date_joined", "date_updated", "id")
+
     fieldsets = (
         (None, {"fields": ("email", "username", "password")}),
         ("Personal Info", {"fields": ("first_name", "last_name", "date_of_birth")}),

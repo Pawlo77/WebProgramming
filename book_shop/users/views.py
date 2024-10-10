@@ -1,15 +1,13 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
     LoginView,
     PasswordChangeView,
     PasswordResetConfirmView,
-    PasswordResetDoneView,
     PasswordResetView,
 )
 from django.shortcuts import redirect, render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 
@@ -21,19 +19,23 @@ from .forms import (
     CustomUserCreationForm,
     UserUpdateForm,
 )
-from .models import CustomUser
+
+
+@method_decorator(login_required, name="dispatch")
+class UserProfileView(View):
+    template_name = "user_profile.html"
+
+    def get(self, request):
+        return render(request, self.template_name, {"user": request.user})
 
 
 @login_required
 def update_profile(request):
-    if request.method == "POST":
-        form = UserUpdateForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Your profile has been updated successfully.")
-            return redirect("profile")
-    else:
-        form = UserUpdateForm(instance=request.user)
+    form = UserUpdateForm(request.POST or None, instance=request.user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Your profile has been updated successfully.")
+        return redirect("profile")
 
     return render(
         request,
@@ -46,15 +48,6 @@ def update_profile(request):
             "link": "profile",
         },
     )
-
-
-@method_decorator(login_required, name="dispatch")
-class UserProfileView(View):
-    template_name = "user_profile.html"
-
-    def get(self, request):
-        user = request.user
-        return render(request, self.template_name, {"user": user})
 
 
 @login_required
@@ -76,31 +69,29 @@ def remove_account(request):
 class CustomSignUpView(View):
     template_name = "form.html"
     form_class = CustomUserCreationForm
-    kw = {
-        "name": "Sign Up",
-        "message_main": "Already have an account?",
-        "message_link": "Log in here",
-        "link": "login",
-    }
+
+    def get_context(self, form=None):
+        return {
+            "form": form or self.form_class(),
+            "name": "Sign Up",
+            "message_main": "Already have an account?",
+            "message_link": "Log in here",
+            "link": "login",
+        }
 
     def get(self, request):
-        form = CustomUserCreationForm()
-        self.kw["form"] = form
-        return render(
-            request,
-            self.template_name,
-            self.kw,
-        )
+        return render(request, self.template_name, self.get_context())
 
     def post(self, request):
-        form = CustomUserCreationForm(request.POST)
-        self.kw["form"] = form
+        form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Your account has been created successfully!")
             return redirect("login")
         else:
             messages.error(request, "Please correct the error below.")
-        return render(request, self.template_name, self.kw)
+
+        return render(request, self.template_name, self.get_context(form))
 
 
 class CustomLoginView(LoginView):
@@ -109,13 +100,17 @@ class CustomLoginView(LoginView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["name"] = "Login"
-        context["message_main"] = "Don't have an account?"
-        context["message_link"] = "Register here"
-        context["link"] = "signup"
-        context["message_main_2"] = "Forgot yout password?"
-        context["message_link_2"] = "Reset it here"
-        context["link_2"] = "password_reset"
+        context.update(
+            {
+                "name": "Login",
+                "message_main": "Don't have an account?",
+                "message_link": "Register here",
+                "link": "signup",
+                "message_main_2": "Forgot your password?",
+                "message_link_2": "Reset it here",
+                "link_2": "password_reset",
+            }
+        )
         return context
 
 
@@ -132,13 +127,11 @@ class CustomPasswordResetView(PasswordResetView):
 
     def form_valid(self, form):
         super().form_valid(form)
-        return render(
+        messages.success(
             self.request,
-            "success.html",
-            {
-                "message": "Email with information about password reset was successfully sent."
-            },
+            "Email with information about password reset was successfully sent.",
         )
+        return redirect("password_reset_done")
 
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
@@ -152,11 +145,8 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
 
     def form_valid(self, form):
         super().form_valid(form)
-        return render(
-            self.request,
-            "success.html",
-            {"message": "Your password has been successfully reset."},
-        )
+        messages.success(self.request, "Your password has been successfully reset.")
+        return redirect("login")
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -165,16 +155,17 @@ class CustomPasswordChangeView(PasswordChangeView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["name"] = "Set New Password"
-        context["message_main"] = "Go back to"
-        context["message_link"] = "profile"
-        context["link"] = "profile"
+        context.update(
+            {
+                "name": "Set New Password",
+                "message_main": "Go back to",
+                "message_link": "profile",
+                "link": "profile",
+            }
+        )
         return context
 
     def form_valid(self, form):
         super().form_valid(form)
-        return render(
-            self.request,
-            "success.html",
-            {"message": "Your password has been successfully reset."},
-        )
+        messages.success(self.request, "Your password has been successfully changed.")
+        return redirect("profile")

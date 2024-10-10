@@ -1,8 +1,29 @@
 from django.contrib import admin
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from utils.admin import auto_fieldset, readonly_fields
 
 from .models import Reaction, Review
+
+User = get_user_model()
+
+
+@admin.action(description="Star selected reviews")
+def star_review(modeladmin, request, queryset):
+    for review in queryset:
+        review.star_review(request.user)
+    modeladmin.message_user(
+        request, f"{queryset.count()} review(s) were successfully starred."
+    )
+
+
+@admin.action(description="Unstar selected reviews")
+def unstar_review(modeladmin, request, queryset):
+    for review in queryset:
+        review.unstar_review(request.user)
+    modeladmin.message_user(
+        request, f"{queryset.count()} review(s) were successfully unstarred."
+    )
 
 
 class ContentTypeFilter(admin.SimpleListFilter):
@@ -11,14 +32,8 @@ class ContentTypeFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
-            (
-                ContentType.objects.get(app_label="items", model="book").id,
-                "Book",
-            ),
-            (
-                ContentType.objects.get(app_label="people", model="author").id,
-                "Author",
-            ),
+            (ContentType.objects.get(app_label="items", model="book").id, "Book"),
+            (ContentType.objects.get(app_label="people", model="author").id, "Author"),
         ]
 
     def queryset(self, request, queryset):
@@ -28,6 +43,7 @@ class ContentTypeFilter(admin.SimpleListFilter):
 
 
 class ReviewAdmin(admin.ModelAdmin):
+    actions = [star_review, unstar_review]
     list_display = (
         "id",
         "critic_name",
@@ -52,25 +68,9 @@ class ReviewAdmin(admin.ModelAdmin):
     readonly_fields = readonly_fields
 
     fieldsets = (
-        (
-            None,
-            {
-                "fields": (
-                    "content_type",
-                    "object_id",
-                    "critic",
-                    "starred",
-                )
-            },
-        ),
-        (
-            "content",
-            {"fields": ("content",)},
-        ),
-        (
-            "details",
-            {"fields": ("date_starred", "starred_by")},
-        ),
+        (None, {"fields": ("content_type", "object_id", "critic", "starred")}),
+        ("Content", {"fields": ("content",)}),
+        ("Details", {"fields": ("date_starred", "starred_by")}),
         auto_fieldset,
     )
 
@@ -103,26 +103,9 @@ class ReactionAdmin(admin.ModelAdmin):
     readonly_fields = readonly_fields
 
     fieldsets = (
-        (
-            None,
-            {
-                "fields": (
-                    "review",
-                    "reaction_type",
-                )
-            },
-        ),
+        (None, {"fields": ("review", "reaction_type")}),
         auto_fieldset,
     )
-
-    def has_view_permission(self, request, obj=None):
-        return request.user.is_staff or request.user.is_superuser
-
-    def has_change_permission(self, request, obj=None):
-        return request.user.is_staff or request.user.is_superuser
-
-    def has_add_permission(self, request):
-        return request.user.is_staff or request.user.is_superuser
 
 
 admin.site.register(Review, ReviewAdmin)

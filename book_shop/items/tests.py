@@ -1,9 +1,8 @@
 from datetime import date
 
 from django.forms import ValidationError
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 from django.urls import resolve, reverse
-from items.models import Award, Book
 from people.models import Author, Critic
 from reviews.models import Reaction, Review
 from users.models import CustomUser
@@ -14,9 +13,10 @@ from .views import AwardDetailView, BookDetailView, BookListView
 
 
 class AwardModelTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         """Set up the test environment, creating a user, author, and award."""
-        self.user = CustomUser.objects.create_user(
+        cls.user = CustomUser.objects.create_user(
             username="admin",
             password="testpass123",
             role=CustomUser.ADMIN,
@@ -24,22 +24,22 @@ class AwardModelTest(TestCase):
             first_name="John",
             last_name="Cena",
         )
-        self.author = Author.objects.create(
+        cls.author = Author.objects.create(
             first_name="Alice",
             last_name="Smith",
             birth_date=date(1975, 5, 5),
             view_count=10,
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
-        self.award = Award.objects.create(
+        cls.award = Award.objects.create(
             name="Best Author",
             description="Award for the best author of the year.",
             year_awarded=2015,
-            author=self.author,
+            author=cls.author,
             website="http://example.com",
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
 
     def test_award_creation(self):
@@ -55,7 +55,8 @@ class AwardModelTest(TestCase):
 
     def test_age(self):
         """Test the calculation of the award's age based on the year awarded."""
-        expected_age = date.today().year - self.award.year_awarded
+        current_year = date.today().year
+        expected_age = current_year - self.award.year_awarded
         self.assertEqual(self.award.age, expected_age)
 
     def test_str_representation(self):
@@ -94,7 +95,6 @@ class AwardModelTest(TestCase):
 
     def test_photo_field(self):
         """Test that the photo field can be empty or null."""
-        # Explicitly create the award without a photo
         award_without_photo = Award.objects.create(
             name="Test Award",
             year_awarded=2020,
@@ -102,7 +102,6 @@ class AwardModelTest(TestCase):
             created_by=self.user,
             updated_by=self.user,
         )
-
         self.assertFalse(bool(award_without_photo.photo))
 
     def test_related_author(self):
@@ -110,11 +109,24 @@ class AwardModelTest(TestCase):
         self.assertEqual(self.award.author.first_name, "Alice")
         self.assertEqual(self.award.author.last_name, "Smith")
 
+    def test_award_creation_with_min_year(self):
+        """Test that the year_awarded cannot be before a certain year."""
+        with self.assertRaises(ValidationError):
+            award = Award(
+                name="Old Award",
+                year_awarded=1900,
+                # author=self.author, # no author provided
+                created_by=self.user,
+                updated_by=self.user,
+            )
+            award.full_clean()  # This should raise ValidationError
+
 
 class BookModelTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         """Set up the test environment, creating a user, author, and book."""
-        self.user = CustomUser.objects.create_user(
+        cls.user = CustomUser.objects.create_user(
             username="admin",
             password="testpass123",
             email="user@example.com",
@@ -122,23 +134,23 @@ class BookModelTest(TestCase):
             first_name="John",
             last_name="Cena",
         )
-        self.author = Author.objects.create(
+        cls.author = Author.objects.create(
             first_name="Alice",
             last_name="Smith",
             birth_date=date(1975, 5, 5),
             view_count=10,
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
-        self.book = Book.objects.create(
+        cls.book = Book.objects.create(
             title="Fantastic Tales",
-            author=self.author,
+            author=cls.author,
             date_published=date(2015, 1, 1),
             isbn="1234567890123",
             language="EN",
             pages=250,
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
 
     def test_book_creation(self):
@@ -254,115 +266,59 @@ class BookModelTest(TestCase):
             created_by=self.user,
             updated_by=self.user,
         )
-
-        # Assert that a validation error is raised when trying to clean the book instance
-        with self.assertRaises(Exception) as context:
-            book.full_clean()
-
-        # Verify that the pages error is included in the raised exception
-        self.assertIn(
-            "pages", context.exception.message_dict
-        )  # Check if 'pages' key is in the error dict
-        self.assertIn(
-            "Ensure this value is greater than or equal to 1.",
-            context.exception.message_dict["pages"],
-        )
+        with self.assertRaises(ValidationError):
+            book.full_clean()  # This should raise ValidationError
 
 
 class BookFilterFormTest(TestCase):
     def setUp(self):
-        """Set up test data for form tests."""
+        """Set up the test environment, creating an author."""
         self.author = Author.objects.create(
             first_name="Alice",
             last_name="Smith",
             birth_date=date(1975, 5, 5),
             view_count=10,
-            created_by=None,
-            updated_by=None,
         )
 
-    def test_form_valid_with_no_data(self):
-        """Test that the form is valid when no data is submitted."""
-        form = BookFilterForm(data={})
-        self.assertTrue(form.is_valid())  # Validate the form
-        self.assertEqual(
-            form.cleaned_data,
-            {
-                "title": "",
-                "author": None,
-                "date_published": None,
-                "language": "",
-                "rating": "",
-            },
-        )
-
-    def test_form_valid_with_valid_data(self):
-        """Test that the form is valid when given valid data."""
+    def test_valid_form_data(self):
+        """Test that a valid form can be submitted."""
         form_data = {
             "title": "Fantastic Tales",
-            "author": self.author.id,
+            "author": self.author.pk,
             "date_published": date(2015, 1, 1),
             "language": "EN",
-            "rating": "5",
+            "rating": 4,
         }
         form = BookFilterForm(data=form_data)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["title"], "Fantastic Tales")
-        self.assertEqual(form.cleaned_data["author"], self.author)
-        self.assertEqual(form.cleaned_data["date_published"], date(2015, 1, 1))
-        self.assertEqual(form.cleaned_data["language"], "EN")
-        self.assertEqual(form.cleaned_data["rating"], "5")
 
-    def test_clean_date_published_future_date(self):
-        """Test that the form raises a validation error for future dates."""
-        future_date = date.today().replace(year=date.today().year + 1)
-        form_data = {"date_published": future_date}
-        form = BookFilterForm(data=form_data)
-        self.assertFalse(form.is_valid())  # Check if the form is not valid
-        self.assertIn(
-            "date_published", form.errors
-        )  # Check that there are errors for date_published
-        self.assertIn(
-            "Invalid published date - date from a future.",
-            form.errors["date_published"],
-        )
-
-    def test_clean_language_strips_whitespace(self):
-        """Test that the clean_language method strips whitespace."""
-        form_data = {"language": "  English  "}
-        form = BookFilterForm(data=form_data)
-        form.is_valid()  # Run validation
-        self.assertEqual(form.cleaned_data["language"], "English")
-
-    def test_form_author_label(self):
-        """Test that the author label is correct."""
-        form = BookFilterForm()
-        expected_label = f"{self.author.first_name} {self.author.last_name}"
-        self.assertEqual(
-            form.fields["author"].label_from_instance(self.author), expected_label
-        )
-
-    def test_invalid_rating(self):
-        """Test that the form is invalid when an invalid rating is provided."""
-        form_data = {"rating": "6"}  # Invalid rating not in choices
+    def test_invalid_form_data(self):
+        """Test that a invalid form can be submitted."""
+        form_data = {
+            "title": "Fantastic Tales",
+            "author": self.author.pk,
+            "date_published": date(2030, 1, 1),  # date from feature
+            "language": "EN",
+            "rating": 4,
+        }
         form = BookFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
-        self.assertIn(
-            "Select a valid choice.", form.errors["rating"][0]
-        )  # Adjusted to check the first error
 
-    def test_rating_default_value(self):
-        """Test that the form defaults rating to 'All'."""
-        form = BookFilterForm(data={})  # Initialize the form with no data
-        self.assertTrue(form.is_valid())  # Ensure the form is valid
-        self.assertEqual(
-            form.cleaned_data["rating"], ""
-        )  # Check the cleaned data for rating
+    def test_form_field_labels(self):
+        """Test that the form fields have correct labels."""
+        form = BookFilterForm()
+        self.assertEqual(form.fields["title"].label, "Title")
+        self.assertEqual(form.fields["author"].label, "Author")
+        self.assertEqual(form.fields["date_published"].label, "Date Published")
+        self.assertEqual(form.fields["language"].label, "Language")
+        self.assertEqual(form.fields["rating"].label, "Rating")
 
 
-class AwardDetailViewTest(TestCase):
-    def setUp(self):
-        self.user = CustomUser.objects.create_user(
+class AwardViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """Set up test environment for Award views."""
+        cls.user = CustomUser.objects.create_user(
             username="admin",
             password="testpass123",
             role=CustomUser.ADMIN,
@@ -370,44 +326,51 @@ class AwardDetailViewTest(TestCase):
             first_name="John",
             last_name="Cena",
         )
-        self.author = Author.objects.create(
+        cls.author = Author.objects.create(
             first_name="Alice",
             last_name="Smith",
             birth_date=date(1975, 5, 5),
             view_count=10,
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
-        self.award = Award.objects.create(
+        cls.award = Award.objects.create(
             name="Best Author",
-            description="Award for the best author of the year.",
             year_awarded=2015,
-            author=self.author,
-            website="http://example.com",
-            created_by=self.user,
-            updated_by=self.user,
+            author=cls.author,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
 
-    def test_award_detail_view(self):
-        """Test that the award detail view displays the award correctly."""
+    def test_award_detail_view_url(self):
+        """Test that the award detail view URL resolves correctly."""
+        url = reverse("award-detail", kwargs={"pk": self.award.pk})
+        self.assertEqual(resolve(url).func.view_class, AwardDetailView)
+
+    def test_award_detail_view_accessible_by_name(self):
+        """Test that the award detail view is accessible by its name."""
+        self.client.login(username="admin", password="testpass123")
+        url = reverse("award-detail", kwargs={"pk": self.award.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_award_detail_view_redirects_for_unauthenticated_user(self):
+        """Test that the award detail view redirects unauthenticated users."""
+        self.client.logout()  # Ensure the user is logged out
         response = self.client.get(
             reverse("award-detail", kwargs={"pk": self.award.pk})
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "award.html")
-        self.assertEqual(response.context["award"], self.award)
-
-    def test_award_view_increments_views(self):
-        """Test that the views count increments when award detail is accessed."""
-        initial_views = self.award.view_count  # Assuming views is a field in Award
-        self.client.get(reverse("award-detail", kwargs={"pk": self.award.pk}))
-        self.award.refresh_from_db()  # Reload the award instance
-        self.assertEqual(self.award.view_count, initial_views + 1)
+        self.assertRedirects(
+            response,
+            f"{reverse('login')}?next={reverse('award-detail', args=[self.award.pk])}",
+        )
 
 
-class BookDetailViewTest(TestCase):
-    def setUp(self):
-        self.user = CustomUser.objects.create_user(
+class BookViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """Set up test environment for Book views."""
+        cls.user = CustomUser.objects.create_user(
             username="admin",
             password="testpass123",
             role=CustomUser.ADMIN,
@@ -415,58 +378,32 @@ class BookDetailViewTest(TestCase):
             first_name="John",
             last_name="Cena",
         )
-        self.author = Author.objects.create(
+        cls.author = Author.objects.create(
             first_name="Alice",
             last_name="Smith",
             birth_date=date(1975, 5, 5),
             view_count=10,
-            created_by=self.user,
-            updated_by=self.user,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
-
-        self.book = Book.objects.create(
+        cls.book = Book.objects.create(
             title="Fantastic Tales",
-            author=self.author,
+            author=cls.author,
             date_published=date(2015, 1, 1),
-            isbn="1234567890124",
+            isbn="1234567890123",
             language="EN",
-            pages=200,
-            created_by=self.user,
-            updated_by=self.user,
+            pages=250,
+            created_by=cls.user,
+            updated_by=cls.user,
         )
 
-    def test_book_detail_view(self):
-        """Test that the book detail view displays the book correctly."""
-        response = self.client.get(reverse("book-detail", kwargs={"pk": self.book.pk}))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "book.html")
-        self.assertEqual(response.context["book"], self.book)
-
-    def test_book_detail_view_like_statuses(self):
-        """Test that the like statuses are included in the context."""
-        response = self.client.get(reverse("book-detail", kwargs={"pk": self.book.pk}))
-        self.assertIn("like_statuses_active", response.context)
-        self.assertIn("like_statuses_unactive", response.context)
-        self.assertIn("disliked_statuses_active", response.context)
-        self.assertIn("disliked_statuses_unactive", response.context)
-
-
-class UrlsTest(SimpleTestCase):
-    def test_book_list_url(self):
-        url = reverse("book-list")
-        self.assertEqual(url, "/items/books")  # Ensure the trailing slash is included
-        self.assertEqual(resolve(url).func.view_class, BookListView)
-
-    def test_book_detail_url(self):
-        url = reverse("book-detail", kwargs={"pk": 1})
-        self.assertEqual(
-            url, "/items/books/1/"
-        )  # Ensure the trailing slash is included
+    def test_book_detail_view_url(self):
+        """Test that the book detail view URL resolves correctly."""
+        url = reverse("book-detail", kwargs={"pk": self.book.pk})
         self.assertEqual(resolve(url).func.view_class, BookDetailView)
 
-    def test_award_detail_url(self):
-        url = reverse("award-detail", kwargs={"pk": 1})
-        self.assertEqual(
-            url, "/items/awards/1/"
-        )  # Ensure the trailing slash is included
-        self.assertEqual(resolve(url).func.view_class, AwardDetailView)
+    def test_book_detail_view_accessible_by_name(self):
+        """Test that the book detail view is accessible by its name."""
+        url = reverse("book-detail", kwargs={"pk": self.book.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

@@ -14,31 +14,31 @@ class Review(Item):
     """Critic review of the author or a book."""
 
     content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, null=False, blank=False
+        ContentType,
+        on_delete=models.CASCADE,
+        help_text="Model type being reviewed (author or book).",
     )
-    object_id = models.PositiveIntegerField(null=False, blank=False)
+    object_id = models.PositiveIntegerField(
+        help_text="The ID of the object being reviewed (author or book)."
+    )
     content_object = GenericForeignKey("content_type", "object_id")
 
     content = models.TextField(
-        help_text="The comment or review.", null=False, blank=False
+        help_text="The comment or review content.", null=False, blank=False
     )
 
     critic = models.ForeignKey(
         Critic,
         on_delete=models.CASCADE,
         related_name="reviews",
-        null=False,
-        blank=False,
+        help_text="The critic writing the review.",
     )
 
     starred = models.BooleanField(
-        help_text="Star review to pin it to top.",
-        default=False,
-        blank=False,
-        null=False,
+        help_text="Indicates whether the review is pinned at the top.", default=False
     )
     date_starred = models.DateTimeField(
-        null=True, blank=True, help_text="Date when the review was starred."
+        null=True, blank=True, help_text="Date the review was starred."
     )
     starred_by = models.ForeignKey(
         CustomUser,
@@ -46,6 +46,7 @@ class Review(Item):
         null=True,
         blank=True,
         related_name="starred_by",
+        help_text="User who starred the review.",
     )
 
     # Auto-generated fields
@@ -74,23 +75,23 @@ class Review(Item):
 
     @property
     def like_count(self):
-        """Calculate the number of likes for the comment."""
+        """Return the number of likes for the review."""
         return self.reactions.filter(reaction_type=Reaction.ReactionType.LIKE).count()
 
     @property
     def dislike_count(self):
-        """Calculate the number of dislikes for the comment."""
+        """Return the number of dislikes for the review."""
         return self.reactions.filter(
             reaction_type=Reaction.ReactionType.DISLIKE
         ).count()
 
     @property
     def net_likes(self):
-        """Calculate the net likes (likes - dislikes) for the comment."""
+        """Return net likes (likes - dislikes) for the review."""
         return self.like_count - self.dislike_count
 
     def add_like(self, user):
-        """Adds user like to current review."""
+        """Add a like reaction to the review by a user."""
         Reaction.objects.create(
             created_by=user,
             reaction_type=Reaction.ReactionType.LIKE,
@@ -99,7 +100,7 @@ class Review(Item):
         )
 
     def add_dislike(self, user):
-        """Adds user dislike to current review."""
+        """Add a dislike reaction to the review by a user."""
         Reaction.objects.create(
             created_by=user,
             reaction_type=Reaction.ReactionType.DISLIKE,
@@ -108,58 +109,51 @@ class Review(Item):
         )
 
     def delete_like(self, user):
-        """Remove user like to current review."""
-        Reaction.objects.filter(
+        """Remove a like reaction from the review by a user."""
+        self.reactions.filter(
             reaction_type=Reaction.ReactionType.LIKE, created_by=user
         ).delete()
 
     def delete_dislike(self, user):
-        """Remove user dislike to current review."""
-        Reaction.objects.filter(
+        """Remove a dislike reaction from the review by a user."""
+        self.reactions.filter(
             reaction_type=Reaction.ReactionType.DISLIKE, created_by=user
         ).delete()
 
     def has_liked(self, user):
-        """Check if given user has liked this review."""
-        if user.is_authenticated:
-            return self.reactions.filter(
+        """Check if the user has liked the review."""
+        return (
+            user.is_authenticated
+            and self.reactions.filter(
                 created_by=user, reaction_type=Reaction.ReactionType.LIKE
             ).exists()
-        return False
+        )
 
     def has_disliked(self, user):
-        """Check if given user has disliked this review."""
-        if user.is_authenticated:
-            return self.reactions.filter(
+        """Check if the user has disliked the review."""
+        return (
+            user.is_authenticated
+            and self.reactions.filter(
                 created_by=user, reaction_type=Reaction.ReactionType.DISLIKE
             ).exists()
-        return False
+        )
 
     def star_review(self, user):
-        """
-        Method to star a review.
-        Only users with the 'Manager' or 'Admin' role can star the review.
-        """
+        """Star the review, restricted to users with the Manager or Admin role."""
         if user.role not in [CustomUser.MANAGER, CustomUser.ADMIN]:
             raise PermissionDenied(
                 "Only users with Manager or Admin roles can star a review."
             )
-
-        # Star the review
         self.starred = True
         self.date_starred = timezone.now()
         self.starred_by = user
         self.save()
 
     def unstar_review(self, user):
-        """
-        Method to unstar a review.
-        Only users with the 'Manager' or 'Admin' role can unstar the review.
-        Clears the 'starred', 'starred_by', and 'date_starred' fields.
-        """
+        """Unstar the review, restricted to users with the Manager or Admin role."""
         if user.role not in [CustomUser.MANAGER, CustomUser.ADMIN]:
             raise PermissionDenied(
-                "Only users with Manager or Admin roles can star a review."
+                "Only users with Manager or Admin roles can unstar a review."
             )
         self.starred = False
         self.date_starred = None
@@ -183,7 +177,7 @@ class Reaction(Item):
     reaction_type = models.CharField(
         max_length=10,
         choices=ReactionType.choices,
-        help_text="Reaction type: Like or Dislike",
+        help_text="Reaction type: Like or Dislike.",
     )
 
     # Auto-generated fields
@@ -203,10 +197,10 @@ class Reaction(Item):
     )
 
     class Meta:
-        unique_together = (
-            "created_by",
-            "review",
-        )
+        unique_together = ("created_by", "review")
+        indexes = [
+            models.Index(fields=["review", "reaction_type"]),
+        ]
 
     def __str__(self):
         return f"{self.created_by.username} - {self.reaction_type} on {self.review}"

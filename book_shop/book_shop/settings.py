@@ -18,6 +18,8 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOGIN_URL = "/users/login/"
+LOGIN_REDIRECT_URL = "/users/profile/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -28,7 +30,7 @@ SECRET_KEY = "django-insecure-v&m6yr-a--x6cl=nh699btb*1rcs%h%kccx$)1%(yvuih_7a*k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition

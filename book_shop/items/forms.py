@@ -8,7 +8,8 @@ from people.models import Author
 
 
 class BookFilterForm(forms.Form):
-    # Form field for book title, not required
+    """Form for filtering books based on various criteria."""
+
     title = forms.CharField(
         required=False,
         label="Title",
@@ -21,7 +22,6 @@ class BookFilterForm(forms.Form):
         ),
     )
 
-    # Form field for selecting an author from a dropdown list
     author = forms.ModelChoiceField(
         queryset=Author.objects.order_by("last_name", "first_name"),
         required=False,
@@ -30,7 +30,6 @@ class BookFilterForm(forms.Form):
         help_text="Book's author.",
     )
 
-    # Form field for publication date, with date input widget
     date_published = forms.DateField(
         required=False,
         widget=forms.DateInput(
@@ -43,7 +42,6 @@ class BookFilterForm(forms.Form):
         help_text="Book's publication date.",
     )
 
-    # Form field for language of the book, not required
     language = forms.CharField(
         required=False,
         label="Language",
@@ -56,7 +54,6 @@ class BookFilterForm(forms.Form):
         ),
     )
 
-    # Form field for rating selection
     rating = forms.ChoiceField(
         choices=[
             ("", "All"),
@@ -73,27 +70,28 @@ class BookFilterForm(forms.Form):
     )
 
     def clean_date_published(self):
-        """Validates that the date_published is not set to a future date."""
+        """Ensure the date published is not a future date."""
         date_published = self.cleaned_data.get("date_published")
-        if date_published:
-            if date_published > date.today():
-                self.add_error(
-                    "date_published", _("Invalid published date - date from a future.")
-                )
+        if date_published and date_published > date.today():
+            self.add_error(
+                "date_published", _("Invalid published date - cannot be a future date.")
+            )
         return date_published
 
     def clean_language(self):
-        """Strips any leading or trailing whitespace from the language input."""
+        """Strip leading and trailing spaces from the language field."""
         language = self.cleaned_data.get("language")
         if language:
             return language.strip()
         return language
 
     def __init__(self, *args, **kwargs):
-        # Initialize the form and set up Crispy Forms helper
+        """Initialize the form and set up Crispy Forms helper for styling."""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_id = "filter-books-form"
         self.helper.form_class = "blueForms"
         self.helper.form_method = "post"
-        self.helper.form_action = "login"
+        self.helper.form_action = (
+            "filter_books"  # Replace with the actual form action if needed
+        )

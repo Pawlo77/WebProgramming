@@ -8,6 +8,7 @@ readonly_fields = (
     "id",
     "view_count",
 )
+
 auto_fieldset = (
     "System",
     {

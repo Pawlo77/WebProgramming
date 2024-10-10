@@ -4,7 +4,16 @@ from utils.admin import auto_fieldset, readonly_fields
 from .models import Award, Book
 
 
-class AwardAdmin(admin.ModelAdmin):
+class AuthorNameMixin:
+    """Mixin to provide author name display method."""
+
+    def author_name(self, obj):
+        return obj.author.name
+
+    author_name.short_description = "Author"
+
+
+class AwardAdmin(AuthorNameMixin, admin.ModelAdmin):
     list_display = ("id", "name", "year_awarded", "author_name", "view_count")
     search_fields = (
         "name",
@@ -21,27 +30,20 @@ class AwardAdmin(admin.ModelAdmin):
         (
             None,
             {
-                "fields": (
-                    "name",
-                    "year_awarded",
-                    "author",
-                )
+                "fields": ("name", "year_awarded", "author"),
             },
         ),
         (
-            "details",
-            {"fields": ("description",)},
+            "Details",
+            {
+                "fields": ("description",),
+            },
         ),
         auto_fieldset,
     )
 
-    def author_name(self, obj):
-        return obj.author.name
 
-    author_name.short_description = "Author"
-
-
-class BookAdmin(admin.ModelAdmin):
+class BookAdmin(AuthorNameMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "title",
@@ -65,25 +67,17 @@ class BookAdmin(admin.ModelAdmin):
         (
             None,
             {
-                "fields": (
-                    "title",
-                    "author",
-                    "date_published",
-                    "rating",
-                )
+                "fields": ("title", "author", "date_published", "rating"),
             },
         ),
         (
-            "details",
-            {"fields": ("isbn", "pages", "cover_image", "summary")},
+            "Details",
+            {
+                "fields": ("isbn", "pages", "cover_image", "summary"),
+            },
         ),
         auto_fieldset,
     )
-
-    def author_name(self, obj):
-        return obj.author.name
-
-    author_name.short_description = "Author"
 
 
 admin.site.register(Book, BookAdmin)
