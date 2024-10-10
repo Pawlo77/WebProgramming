@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.forms import ValidationError
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import resolve, reverse
 from people.models import Author, Critic
 from reviews.models import Reaction, Review
@@ -396,6 +396,14 @@ class BookViewTest(TestCase):
             created_by=cls.user,
             updated_by=cls.user,
         )
+        cls.award = Award(
+            name="Old Award",
+            year_awarded=1900,
+            author=cls.author,
+            created_by=cls.user,
+            updated_by=cls.user,
+        )
+        cls.client = Client()
 
     def test_book_detail_view_url(self):
         """Test that the book detail view URL resolves correctly."""
@@ -407,3 +415,23 @@ class BookViewTest(TestCase):
         url = reverse("book-detail", kwargs={"pk": self.book.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_book_list_url(self):
+        """Test the URL for the Book List view."""
+        response = self.client.get(reverse("book-list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "books.html")
+
+    def test_book_detail_url(self):
+        """Test the URL for the Book Detail view."""
+        response = self.client.get(reverse("book-detail", args=[self.book.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "book.html")
+
+    def test_award_detail_url(self):
+        """Test the URL for the Award Detail view."""
+        self.award.save()  # for some reason it is not saved by default
+        self.client.login(username="admin", password="testpass123")
+        response = self.client.get(reverse("award-detail", args=[self.award.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "award.html")

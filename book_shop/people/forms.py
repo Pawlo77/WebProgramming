@@ -38,9 +38,9 @@ class BaseFilterForm(forms.Form):
         max_length=4,
         help_text="Person's birth year.",
     )
-    website = forms.URLField(
+    website = forms.CharField(
         required=False,
-        widget=forms.URLInput(
+        widget=forms.TextInput(
             attrs={
                 "placeholder": "https://example.com",
                 "class": "form-control",
@@ -72,7 +72,7 @@ class BaseFilterForm(forms.Form):
     def clean_name(self):
         """Strip leading and trailing whitespace from the name field."""
         name = self.cleaned_data.get("name")
-        return name.strip() if name else name
+        return name.strip() if name else None
 
 
 class AuthorFilterForm(BaseFilterForm):
