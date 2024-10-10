@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">{{ name }}</h2>
+                </div>
+                <div class="card-body bg-light">
+                    <form method="post" class="p-4">
+                        {% csrf_token %}
+
+                        {# Render the form with Crispy Forms #}
+                        {{ form|crispy }}
+
+                        <div class="d-flex justify-content-center mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg">{{ name }}</button>
+                        </div>
+
+                        {% if link %}
+                        <div class="text-center mt-3">
+                            <p class="text-muted">{{ message_main }}<a href="{% url link %}" class="text-primary">
+                                    {{ message_link }}</a>.</p>
+                        </div>
+                        {% endif %}
+                        {% if link_2 %}
+                        <div class="text-center mt-3">
+                            <p class="text-muted">{{ message_main_2 }}<a href="{% url link_2 %}" class="text-primary">
+                                    {{ message_link_2 }}</a>.</p>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

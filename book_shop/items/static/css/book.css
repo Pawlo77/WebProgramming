@@ -1,0 +1,7 @@
+.star-icon {
+    position: absolute;
+    top: -1em;   /* Adjust to your preference */
+    right: -0.5em; /* Adjust to your preference */
+    width: 2em;  /* Ensure it matches the size in your HTML */
+    height: 2em; /* Ensure it matches the size in your HTML */
+}

@@ -1,0 +1,93 @@
+<!-- user_profile.html -->
+{% extends 'base.html' %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white text-center">
+            <h2 class="mb-0">User Profile</h2>
+        </div>
+        <div class="card-body bg-light">
+            <h4 class="text-center">Personal Information</h4>
+            <div class="table-responsive">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Username</th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">First Name</th>
+                            <td>{{ user.first_name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last Name</th>
+                            <td>{{ user.last_name }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Email</th>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date of Birth</th>
+                            <td>{{ user.date_of_birth|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Role</th>
+                            <td>{{ user.role }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Education</th>
+                            <td>{{ user.education|default:"Not provided" }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date Joined</th>
+                            <td>{{ user.date_joined }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Last profile update date</th>
+                            <td>{{ user.date_updated }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body bg-light">
+            <h4 class="text-center">Account Actions</h4>
+            <div class="d-flex justify-content-center">
+                <a href="{% url 'update_account' %}" class="btn btn-warning mx-2">Update Account</a>
+                <a href="{% url 'password_change' %}" class="btn btn-danger mx-2">Change Password</a>
+                <button class="btn btn-danger mx-2" data-toggle="modal" data-target="#removeAccountModal">Remove
+                    Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="removeAccountModal" tabindex="-1" aria-labelledby="removeAccountModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeAccountModalLabel">Confirm Account Removal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove your account? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <form id="removeAccountForm" method="post" action="{% url 'remove_account' %}">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Yes, Remove My Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

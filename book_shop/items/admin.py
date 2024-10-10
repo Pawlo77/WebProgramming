@@ -1,0 +1,83 @@
+from django.contrib import admin
+from utils.admin import auto_fieldset, readonly_fields
+
+from .models import Award, Book
+
+
+class AwardAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "year_awarded", "author_name")
+    search_fields = (
+        "name",
+        "year_awarded",
+        "author__first_name",
+        "author__last_name",
+        "id",
+    )
+    list_filter = ("year_awarded", "author__first_name", "author__last_name")
+    ordering = ("-year_awarded", "id")
+    readonly_fields = readonly_fields
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "year_awarded",
+                    "author",
+                )
+            },
+        ),
+        (
+            "details",
+            {"fields": ("description",)},
+        ),
+        auto_fieldset,
+    )
+
+    def author_name(self, obj):
+        return obj.author.name
+
+    author_name.short_description = "Author"
+
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "isbn", "date_published", "author_name")
+    search_fields = ("title", "isbn", "date_published", "id")
+    list_filter = (
+        "date_published",
+        "author__first_name",
+        "author__last_name",
+        "language",
+        "rating",
+    )
+    ordering = ("-date_published", "rating")
+    readonly_fields = readonly_fields
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "title",
+                    "author",
+                    "date_published",
+                    "rating",
+                )
+            },
+        ),
+        (
+            "details",
+            {"fields": ("isbn", "pages", "cover_image", "summary")},
+        ),
+        auto_fieldset,
+    )
+
+    def author_name(self, obj):
+        return obj.author.name
+
+    author_name.short_description = "Author"
+
+
+admin.site.register(Book, BookAdmin)
+admin.site.register(Award, AwardAdmin)
