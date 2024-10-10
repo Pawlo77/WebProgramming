@@ -7,32 +7,66 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Reaction',
+            name="Reaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('reaction_type', models.CharField(choices=[('like', 'Like'), ('dislike', 'Dislike')], help_text='Reaction type: Like or Dislike', max_length=10)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                (
+                    "reaction_type",
+                    models.CharField(
+                        choices=[("like", "Like"), ("dislike", "Dislike")],
+                        help_text="Reaction type: Like or Dislike",
+                        max_length=10,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('object_id', models.PositiveIntegerField()),
-                ('content', models.TextField(help_text='The comment or review.')),
-                ('starred', models.BooleanField(default=False, help_text='Star review to pin it to top.')),
-                ('date_starred', models.DateTimeField(blank=True, help_text='Date when the review was starred.', null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                ("object_id", models.PositiveIntegerField()),
+                ("content", models.TextField(help_text="The comment or review.")),
+                (
+                    "starred",
+                    models.BooleanField(
+                        default=False, help_text="Star review to pin it to top."
+                    ),
+                ),
+                (
+                    "date_starred",
+                    models.DateTimeField(
+                        blank=True,
+                        help_text="Date when the review was starred.",
+                        null=True,
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Reviews',
+                "verbose_name_plural": "Reviews",
             },
         ),
     ]

@@ -8,7 +8,7 @@ from .models import Author, Critic
 
 
 @admin.action(description="Reset View Count")
-def deactivate_users(modeladmin, request, queryset):
+def reset_view_count(modeladmin, request, queryset):
     queryset.update(view_count=0)
     modeladmin.message_user(
         request, f"{queryset.count()} people(s) were successfully reseted."
@@ -104,8 +104,15 @@ class AliveFilter(admin.SimpleListFilter):
 
 
 class CriticAdmin(admin.ModelAdmin):
-    actions = [deactivate_users]
-    list_display = ("id", "name", "expertise_area", "total_activity", "display_alive")
+    actions = [reset_view_count]
+    list_display = (
+        "id",
+        "name",
+        "expertise_area",
+        "total_activity",
+        "display_alive",
+        "view_count",
+    )
     search_fields = ("first_name", "last_name", "expertise_area", "nationality", "id")
     list_filter = (
         "expertise_area",
@@ -124,8 +131,8 @@ class CriticAdmin(admin.ModelAdmin):
             ),
         ),
     )
-    ordering = ("expertise_area", "last_name", "first_name")
-    readonly_fields = ("view_count", *readonly_fields)
+    ordering = ("expertise_area", "last_name", "first_name", "view_count")
+    readonly_fields = readonly_fields
 
     fieldsets = (
         (
@@ -142,7 +149,6 @@ class CriticAdmin(admin.ModelAdmin):
             "details",
             {"fields": ("birth_date", "death_date", "nationality", "website", "photo")},
         ),
-        ("metrics", {"fields": ("view_count",)}),
         auto_fieldset,
     )
 
@@ -154,7 +160,7 @@ class CriticAdmin(admin.ModelAdmin):
 
 
 class AuthorAdmin(admin.ModelAdmin):
-    actions = [deactivate_users]
+    actions = [reset_view_count]
     list_display = (
         "id",
         "name",
@@ -162,6 +168,7 @@ class AuthorAdmin(admin.ModelAdmin):
         "awards_num",
         "popularity",
         "display_alive",
+        "view_count",
     )
     search_fields = ("first_name", "last_name", "nationality", "id")
     list_filter = (
@@ -183,8 +190,8 @@ class AuthorAdmin(admin.ModelAdmin):
             ),
         ),
     )
-    ordering = ("last_name", "first_name")
-    readonly_fields = ("view_count", *readonly_fields)
+    ordering = ("last_name", "first_name", "view_count")
+    readonly_fields = readonly_fields
 
     fieldsets = (
         (
@@ -200,7 +207,6 @@ class AuthorAdmin(admin.ModelAdmin):
             "details",
             {"fields": ("birth_date", "death_date", "nationality", "website", "photo")},
         ),
-        ("metrics", {"fields": ("view_count",)}),
         auto_fieldset,
     )
 

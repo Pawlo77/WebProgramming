@@ -121,15 +121,19 @@ class Review(Item):
 
     def has_liked(self, user):
         """Check if given user has liked this review."""
-        return self.reactions.filter(
-            created_by=user, reaction_type=Reaction.ReactionType.LIKE
-        ).exists()
+        if user.is_authenticated:
+            return self.reactions.filter(
+                created_by=user, reaction_type=Reaction.ReactionType.LIKE
+            ).exists()
+        return False
 
     def has_disliked(self, user):
         """Check if given user has disliked this review."""
-        return self.reactions.filter(
-            created_by=user, reaction_type=Reaction.ReactionType.DISLIKE
-        ).exists()
+        if user.is_authenticated:
+            return self.reactions.filter(
+                created_by=user, reaction_type=Reaction.ReactionType.DISLIKE
+            ).exists()
+        return False
 
     def star_review(self, user):
         """

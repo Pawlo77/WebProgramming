@@ -7,14 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('items', '0004_remove_book_items_book_publish_dfdeae_idx_and_more'),
-        ('people', '0003_remove_author_people_auth_first_p_f95cca_idx_and_more'),
+        ("items", "0004_remove_book_items_book_publish_dfdeae_idx_and_more"),
+        ("people", "0003_remove_author_people_auth_first_p_f95cca_idx_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='award',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='awards', to='people.author'),
+            model_name="award",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="awards",
+                to="people.author",
+            ),
         ),
     ]

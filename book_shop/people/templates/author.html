@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% load people_filters %}
 
 {% block title %}{{ author.name }}{% endblock %}
 
 
 {% block custom_css %}
-<link rel="stylesheet" href="{% static 'css/author.css' %}">
+<link rel="stylesheet" href="{% static 'css/person.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">"{{ author.name }}"</h1>
+    <h1 class="text-center mb-4">{{ author.name }}</h1>
 
     <div class="card shadow-sm mb-4">
         <div class="row g-0">
-            <!-- Book Details -->
+            <!-- Author Details -->
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title"><strong>Details</strong></h5>
@@ -32,53 +33,95 @@
                     <p class="card-text" style="margin-left: 20px;"><strong>Age:</strong> {{ author.age }} years</p>
                     {% endif %}
                     <p class="card-text" style="margin-left: 20px;"><strong>Nationality:</strong>
-                        {{ author.nationality }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Website:</strong><a
-                            href="{{ author.website }}"> {{ author.website }} </a></p>
+                        {% if author.nationality %}
+                        {{ author.nationality }}
+                        {% else %}
+                        <span class="text-muted">
+                            Unknown
+                        </span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Website:</strong>
+                        {% if author.website %}
+                        <a href="{{ author.website }}">
+                            {{ author.website }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">
+                            No website available
+                        </span>
+                        {% endif %}
+                    </p>
+                    </p>
                     <p class="card-text" style="margin-left: 20px;"><strong>View Count:</strong>
                         {{ author.view_count }}</p>
                     <p class="card-text" style="margin-left: 20px;"><strong>Popularity:</strong>
-                        {{ author.popularity }}</p>
-                    {% if author.awards_num > 0 %}
-                    <p class="card-text" style="margin-left: 20px;"><strong>Awards Number:</strong>
-                        {{ author.awards_num }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Firstly awarded at:</strong>
-                        {{ author.first_award_date }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Lastly awarded at:</strong>
-                        {{ author.last_award_date }}</p>
-                    {% else %}
-                    <p class="card-text" style="margin-left: 20px;">This author hasn't recieved any awards
-                        {% if not author.death_date %} yet{% endif %}.</p>
-                    {% endif %}
-                    {% if author.publications_num > 0 %}
-                    <p class="card-text" style="margin-left: 20px;"><strong>Publications Number:</strong>
-                        {{ author.publications_num }}
-                    <p class="card-text" style="margin-left: 20px;"><strong>First Publication Date:</strong>
-                        {{ author.first_publication_date }} </p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Last Publication Date:</strong>
-                        {{ author.last_publication_date }} </p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Career Span:</strong>
-                        {{ author.career_span }} </p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Best rated book:</strong>
-                        {{ author.best_rated_book }} </p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Mostly reviewed book:</strong>
-                        {{ author.mostly_reviewed_book }} </p>
-                    {% else %}
-                    <p class="card-text" style="margin-left: 20px;">This author hasn't published anything yet </p>
-                    {% endif %}
+                        {{ author.popularity|floatformat:2 }}</p>
                 </div>
             </div>
 
             <!-- Author Image -->
             <div class="col-md-4 text-center">
                 {% if author.photo %}
-                <img src="{{ author.photo.url }}" class="img-fluid rounded-start" alt="Author Photo"
+                <img src="{{ author.photo.url }}" class="img-fluid rounded-start p-4" alt="Author Photo"
                     style="max-height: 400px; object-fit: cover;">
                 {% else %}
-                <img src="{% static 'author.jpeg' %}" class="img-fluid rounded-start" alt="Default Author Photo"
+                <img src="{% static 'author.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Author Photo"
                     style="max-height: 400px; object-fit: cover;">
                 {% endif %}
             </div>
+        </div>
+    </div>
+
+    <!-- Awards Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><strong>Author's awards summary</strong></h5>
+            {% if author.awards_num > 0 %}
+            <p class="card-text" style="margin-left: 20px;"><strong>Awards Number:</strong>
+                {{ author.awards_num }}</p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Firstly awarded at:</strong>
+                {{ author.first_award_date }}</p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Lastly awarded at:</strong>
+                {{ author.last_award_date }}</p>
+            {% else %}
+            <p class="card-text" style="margin-left: 20px;">This author hasn't recieved any awards
+                {% if not author.death_date %} yet{% endif %}.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Publications Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><strong>Author's publications</strong></h5>
+            {% if author.publications_num > 0 %}
+            <p class="card-text" style="margin-left: 20px;"><strong>Publications Number:</strong>
+                {{ author.publications_num }}
+            <p class="card-text" style="margin-left: 20px;"><strong>First Publication Date:</strong>
+                {{ author.first_publication_date }} </p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Last Publication Date:</strong>
+                {{ author.last_publication_date }} </p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Career Span:</strong>
+                {{ author.career_span }} {% if author.career_span == 1 %}year{% else %}years{% endif %}</p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Mostly viewed book:</strong> <a
+                    href="{% url 'book-detail' author.mostly_viewed_book.id %}">
+                    {{ author.mostly_viewed_book.title }}</p></a>
+            <p class="card-text" style="margin-left: 20px;"><strong>Best rated book:</strong> <a
+                    href="{% url 'book-detail' author.best_rated_book.id %}">
+                    {{ author.best_rated_book.title }} </p></a>
+            <p class="card-text" style="margin-left: 20px;"><strong>Mostly reviewed book:</strong>
+                {% if author.mostly_reviewed_book %}
+                <a href="{% url 'book-detail' author.mostly_reviewed_book.id %}">
+                    {{ author.mostly_reviewed_book.title }}</a>
+                {% else %}
+                <span class="text-muted">None of author's books have been reviewed.</span>
+                {% endif %}
+            </p>
+            {% else %}
+            <p class="card-text" style="margin-left: 20px;">This author hasn't published anything
+                {% if not author.death_date %} yet{% endif %}.</p>
+            {% endif %}
         </div>
     </div>
 
@@ -93,10 +136,10 @@
     <!-- Reviews Card -->
     <div class="card shadow-sm mb-4">
         <div class="card-body position-relative">
-            <h5 class="card-title mb-4"><strong>Reviews</strong></h5>
+            <h5 class="card-title mb-4"><strong>Author's Reviews</strong></h5>
 
             {% if user.is_authenticated %}
-            {% for review in book.reviews %}
+            {% for review in author.reviews %}
             <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;">
                 {% if review.starred %}
                 <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="#ffc107"
@@ -107,7 +150,8 @@
                 </svg>
                 {% endif %}
 
-                <p class="card-text"><strong>{{ review.critic.name }}</strong> - <span class="text-muted">
+                <p class="card-text"><strong><a href="{% url 'critic-detail' review.critic.id %}">
+                            {{ review.critic.name}}</a></strong> - <span class="text-muted">
                         {{ review.date_created|date:"F j, Y" }}</span></p>
                 <p class="card-text">{{ review.content }}</p>
 
@@ -156,21 +200,57 @@
                 </div>
             </div>
             {% empty %}
-            <p class="text-center">No reviews available for this book.</p>
+            <p class="text-center">No reviews available for this author.</p>
             {% endfor %}
             {% else %}
-            <p class="text-center">You need to be <a href="{% url 'login' %}">logged in</a> to see the reviews.</p>
+            <p class="text-center">You need to be <a href="{% url 'login' %}">logged in</a> to see author's reviews.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Awards Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body position-relative">
+            <h5 class="card-title mb-4"><strong>Author's Awards</strong></h5>
+
+            {% if user.is_authenticated %}
+            {% for award in author.awards.all %}
+            <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;">
+                <p class="card-text"><strong>{{ award.name }}</strong> - <span class="text-muted">
+                        {{ award.year_awarded }}</span></p>
+                <p class="card-text">
+                    {% if award.description|length > 100 %}
+                    {{ award.description|slice:":100" }}...
+                    {% else %}
+                    {{ award.description }}
+                    {% endif %}
+                </p>
+                <div style="position: absolute; bottom: 0.5em; right: 0.5em;">
+                    <button class="btn" onclick="window.location='{% url 'award-detail' award.id %}'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="#027bff"
+                            class="bi bi-arrow-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">No awards available for this author.</p>
+            {% endfor %}
+            {% else %}
+            <p class="text-center">You need to be <a href="{% url 'login' %}">logged in</a> to see author's awards.</p>
             {% endif %}
         </div>
     </div>
 
     <div class="text-center mt-4">
-        <a href="{% url 'book-list' %}" class="btn btn-primary">Back to Book List</a>
+        <a href="{% url 'author-list' %}" class="btn btn-primary">Back to Authors List</a>
     </div>
 </div>
 
 {% endblock %}
 
 {% block custom_js %}
-<script src="{% static 'js/book.js' %}" defer></script>
+<script src="{% static 'js/person.js' %}" defer></script>
 {% endblock %}

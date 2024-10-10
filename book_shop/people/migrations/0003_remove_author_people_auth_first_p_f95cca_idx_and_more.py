@@ -6,24 +6,24 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('people', '0002_initial'),
+        ("people", "0002_initial"),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='author',
-            name='people_auth_first_p_f95cca_idx',
+            model_name="author",
+            name="people_auth_first_p_f95cca_idx",
         ),
         migrations.RemoveIndex(
-            model_name='author',
-            name='people_auth_last_pu_edb3c6_idx',
+            model_name="author",
+            name="people_auth_last_pu_edb3c6_idx",
         ),
         migrations.RemoveField(
-            model_name='author',
-            name='first_publication_date',
+            model_name="author",
+            name="first_publication_date",
         ),
         migrations.RemoveField(
-            model_name='author',
-            name='last_publication_date',
+            model_name="author",
+            name="last_publication_date",
         ),
     ]

@@ -8,42 +8,94 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Award',
+            name="Award",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='Name of the award.', max_length=255)),
-                ('description', models.TextField(blank=True, help_text='Description or significance of the award.', null=True)),
-                ('year_awarded', models.IntegerField(blank=True, default=2024, help_text='Year the award was received.')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(help_text="Name of the award.", max_length=255),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Description or significance of the award.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "year_awarded",
+                    models.IntegerField(
+                        blank=True,
+                        default=2024,
+                        help_text="Year the award was received.",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Awards',
-                'ordering': ['-year_awarded'],
+                "verbose_name_plural": "Awards",
+                "ordering": ["-year_awarded"],
             },
         ),
         migrations.CreateModel(
-            name='Book',
+            name="Book",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('title', models.CharField(max_length=200)),
-                ('published_date', models.DateField()),
-                ('isbn', models.CharField(max_length=13, unique=True)),
-                ('pages', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1)])),
-                ('language', models.CharField(max_length=30)),
-                ('cover_image', models.ImageField(blank=True, null=True, upload_to='covers/')),
-                ('summary', models.TextField(blank=True, null=True)),
-                ('rating', models.DecimalField(blank=True, decimal_places=2, default=0, max_digits=3, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(5)])),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                ("title", models.CharField(max_length=200)),
+                ("published_date", models.DateField()),
+                ("isbn", models.CharField(max_length=13, unique=True)),
+                (
+                    "pages",
+                    models.PositiveIntegerField(
+                        validators=[django.core.validators.MinValueValidator(1)]
+                    ),
+                ),
+                ("language", models.CharField(max_length=30)),
+                (
+                    "cover_image",
+                    models.ImageField(blank=True, null=True, upload_to="covers/"),
+                ),
+                ("summary", models.TextField(blank=True, null=True)),
+                (
+                    "rating",
+                    models.DecimalField(
+                        blank=True,
+                        decimal_places=2,
+                        default=0,
+                        max_digits=3,
+                        validators=[
+                            django.core.validators.MinValueValidator(0),
+                            django.core.validators.MaxValueValidator(5),
+                        ],
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Books',
+                "verbose_name_plural": "Books",
             },
         ),
     ]

@@ -4,15 +4,32 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
+from reviews.models import Reaction, Review
 
 from .forms import BookFilterForm
-from .models import Book, Reaction, Review  # Ensure you import your models
+from .models import Award, Book
+
+
+class AwardDetailView(DetailView):
+    model = Award
+    template_name = "award.html"
+    context_object_name = "award"
+
+    def get_object(self):
+        award = super().get_object()
+        award.update_views()
+        return award
 
 
 class BookDetailView(DetailView):
     model = Book
     template_name = "book.html"
     context_object_name = "book"
+
+    def get_object(self):
+        book = super().get_object()
+        book.update_views()
+        return book
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,7 +62,7 @@ class BookListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().order_by("-view_count", "-rating")
         form = BookFilterForm(self.request.GET or None)
 
         if form.is_valid():

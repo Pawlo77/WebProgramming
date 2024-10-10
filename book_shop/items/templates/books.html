@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
-{% block title %}{{ name }}{% endblock %}
+{% block title %}Books{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'css/books.css' %}">
@@ -39,7 +40,7 @@
                 {% for book in books %}
                 <tr class="clickable-row" data-href="{% url 'book-detail' book.pk %}">
                     <td>{{ book.title }}</td>
-                    <td>{{ book.author.name }}</td>
+                    <td><a href="{% url 'author-detail' book.author.id %}">{{ book.author.name }}</a></td>
                     <td>{{ book.date_published }}</td>
                     <td>{{ book.pages }}</td>
                     <td>{{ book.language }}</td>

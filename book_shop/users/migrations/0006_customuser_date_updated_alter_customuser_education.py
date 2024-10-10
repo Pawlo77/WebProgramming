@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0005_customuser_education_alter_customuser_role'),
+        ("users", "0005_customuser_education_alter_customuser_role"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='date_updated',
+            model_name="customuser",
+            name="date_updated",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='customuser',
-            name='education',
-            field=models.CharField(blank=True, choices=[('uneducated', 'Uneducated'), ('primary', 'Primary'), ('middle', 'Middle'), ('high', 'High')], max_length=10, null=True),
+            model_name="customuser",
+            name="education",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("uneducated", "Uneducated"),
+                    ("primary", "Primary"),
+                    ("middle", "Middle"),
+                    ("high", "High"),
+                ],
+                max_length=10,
+                null=True,
+            ),
         ),
     ]

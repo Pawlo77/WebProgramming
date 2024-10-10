@@ -3,7 +3,7 @@ from datetime import date
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Case, Count, F, IntegerField, Value, When
+from django.db.models import Case, Count, F, IntegerField, When
 from people.models import Author
 from reviews.models import Reaction, Review
 from users.models import CustomUser
@@ -32,6 +32,17 @@ class Award(Item):
         related_name="awards",
         null=False,
         blank=False,
+    )
+
+    # Additional information
+    website = models.URLField(
+        blank=True, null=True, help_text="Award's official website link."
+    )
+    photo = models.ImageField(
+        upload_to="award_photos/",
+        blank=True,
+        null=True,
+        help_text="Award's photograph.",
     )
 
     # View Count

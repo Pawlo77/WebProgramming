@@ -36,6 +36,7 @@ class ReviewAdmin(admin.ModelAdmin):
         "starred",
         "like_count",
         "dislike_count",
+        "view_count",
     )
     search_fields = ("critic__first_name", "critic__last_name", "id", "object_id")
     list_filter = (
@@ -47,7 +48,7 @@ class ReviewAdmin(admin.ModelAdmin):
         "starred_by__last_name",
         "object_id",
     )
-    ordering = ("content_type", "critic__last_name", "critic__first_name")
+    ordering = ("content_type", "critic__last_name", "critic__first_name", "view_count")
     readonly_fields = readonly_fields
 
     fieldsets = (

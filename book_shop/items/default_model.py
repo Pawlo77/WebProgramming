@@ -3,9 +3,6 @@ from datetime import date
 from django.db import models
 
 
-
-
-
 class Item(models.Model):
     # Auto-generated fields
     date_created = models.DateTimeField(auto_now_add=True)

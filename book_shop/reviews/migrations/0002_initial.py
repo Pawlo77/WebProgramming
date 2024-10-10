@@ -10,67 +10,113 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('people', '0002_initial'),
-        ('reviews', '0001_initial'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("people", "0002_initial"),
+        ("reviews", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reaction',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='reaction_created_by', to=settings.AUTH_USER_MODEL),
+            model_name="reaction",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="reaction_created_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='reaction',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='reaction_updated_by', to=settings.AUTH_USER_MODEL),
+            model_name="reaction",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="reaction_updated_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='content_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
+            model_name="review",
+            name="content_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.contenttype",
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='created_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='review_created_by', to=settings.AUTH_USER_MODEL),
+            model_name="review",
+            name="created_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="review_created_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='critic',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='critics', to='people.critic'),
+            model_name="review",
+            name="critic",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="critics",
+                to="people.critic",
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='starred_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='starred_by', to=settings.AUTH_USER_MODEL),
+            model_name="review",
+            name="starred_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="starred_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='review',
-            name='updated_by',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='review_updated_by', to=settings.AUTH_USER_MODEL),
+            model_name="review",
+            name="updated_by",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="review_updated_by",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='reaction',
-            name='review',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='reviews.review'),
+            model_name="reaction",
+            name="review",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reviews",
+                to="reviews.review",
+            ),
         ),
         migrations.AddIndex(
-            model_name='review',
-            index=models.Index(fields=['content_type', 'object_id'], name='reviews_rev_content_627d80_idx'),
+            model_name="review",
+            index=models.Index(
+                fields=["content_type", "object_id"],
+                name="reviews_rev_content_627d80_idx",
+            ),
         ),
         migrations.AddIndex(
-            model_name='review',
-            index=models.Index(fields=['date_updated'], name='reviews_rev_date_up_803746_idx'),
+            model_name="review",
+            index=models.Index(
+                fields=["date_updated"], name="reviews_rev_date_up_803746_idx"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='review',
-            unique_together={('content_type', 'object_id', 'critic')},
+            name="review",
+            unique_together={("content_type", "object_id", "critic")},
         ),
         migrations.AlterUniqueTogether(
-            name='reaction',
-            unique_together={('created_by', 'review')},
+            name="reaction",
+            unique_together={("created_by", "review")},
         ),
     ]

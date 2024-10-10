@@ -21,15 +21,16 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView
-from utils.views import ContactUsView, about, home
+from utils.views import ContactUsView, about_view, home_view
 
 urlpatterns = [
-    path("", home, name="home"),
-    path("about/", about, name="about"),
+    path("", home_view, name="home"),
+    path("about/", about_view, name="about"),
     path("contact/", ContactUsView.as_view(), name="contact"),
     path("users/", include("users.urls")),
     path("items/", include("items.urls")),
     path("reviews/", include("reviews.urls")),
+    path("people/", include("people.urls")),
     # system
     path(
         "admin/password_change/",

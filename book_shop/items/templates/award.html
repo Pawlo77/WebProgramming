@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load book_filters %}
+
+{% block title %}{{ award.name }}{% endblock %}
+
+
+{% block custom_css %}
+<link rel="stylesheet" href="{% static 'css/book.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">"{{ award.name }}"</h1>
+
+    <div class="card shadow-sm mb-4">
+        <div class="row g-0">
+            <!-- Book Details -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title"><strong>Details</strong></h5>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Name:</strong> {{ award.name }}</p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Year awarded:</strong>
+                        {{ award.year_awarded }}</p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Reciever:</strong> <a
+                            href="{% url 'author-detail' award.author.id %}">{{ award.author.name }}</a></p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Website:</strong>
+                        {% if award.website %}
+                        <a href="{{ award.website }}">
+                            {{ award.website }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">
+                            No website available
+                        </span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Views Count:</strong>
+                        {{ award.view_count }}</p>
+                </div>
+            </div>
+
+            <!-- Book Cover Image -->
+            <div class="col-md-4 text-center">
+                {% if award.image %}
+                <img src="{{ award.photo.url }}" class="img-fluid rounded-start p-4" alt="Award Photo"
+                    style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                <img src="{% static 'award.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Award Photo"
+                    style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><strong>Description</strong></h5>
+            <p class="card-text">{{ award.description }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block custom_js %}
+<script src="{% static 'js/book.js' %}" defer></script>
+{% endblock %}

@@ -2,23 +2,29 @@ from datetime import date
 
 from crispy_forms.helper import FormHelper
 from django import forms
+from people.models import Author
 
 from .models import Book
 
 
 class BookFilterForm(forms.Form):
-    title = forms.CharField(required=False, label="Title")
+    title = forms.CharField(required=False, label="Title", help_text="Book title.")
     author = forms.ModelChoiceField(
-        queryset=Book.objects.values_list("author", flat=True).distinct(),
+        queryset=Author.objects.order_by("last_name", "first_name"),
         required=False,
         label="Author",
+        widget=forms.Select(attrs={"class": "form-control"}),
+        help_text="Book's author.",
     )
     date_published = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={"type": "date"}),
         label="Date Published",
+        help_text="Book's publication date.",
     )
-    language = forms.CharField(required=False, label="Language")
+    language = forms.CharField(
+        required=False, label="Language", help_text="Book's original language."
+    )
     rating = forms.ChoiceField(
         choices=[
             ("", "All"),
@@ -30,6 +36,7 @@ class BookFilterForm(forms.Form):
         ],
         required=False,
         label="Rating",
+        help_text="Book's rating.",
     )
 
     def clean_date_published(self):
@@ -57,3 +64,7 @@ class BookFilterForm(forms.Form):
         self.helper.form_class = "blueForms"
         self.helper.form_method = "post"
         self.helper.form_action = "login"
+
+        self.fields["author"].label_from_instance = (
+            lambda obj: f"{obj.first_name} {obj.last_name}"
+        )

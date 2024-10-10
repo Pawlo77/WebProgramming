@@ -5,7 +5,7 @@ from .models import Award, Book
 
 
 class AwardAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "year_awarded", "author_name")
+    list_display = ("id", "name", "year_awarded", "author_name", "view_count")
     search_fields = (
         "name",
         "year_awarded",
@@ -14,7 +14,7 @@ class AwardAdmin(admin.ModelAdmin):
         "id",
     )
     list_filter = ("year_awarded", "author__first_name", "author__last_name")
-    ordering = ("-year_awarded", "id")
+    ordering = ("-year_awarded", "view_count")
     readonly_fields = readonly_fields
 
     fieldsets = (
@@ -42,7 +42,14 @@ class AwardAdmin(admin.ModelAdmin):
 
 
 class BookAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "isbn", "date_published", "author_name")
+    list_display = (
+        "id",
+        "title",
+        "isbn",
+        "date_published",
+        "author_name",
+        "view_count",
+    )
     search_fields = ("title", "isbn", "date_published", "id")
     list_filter = (
         "date_published",
@@ -51,7 +58,7 @@ class BookAdmin(admin.ModelAdmin):
         "language",
         "rating",
     )
-    ordering = ("-date_published", "rating")
+    ordering = ("-date_published", "rating", "view_count")
     readonly_fields = readonly_fields
 
     fieldsets = (

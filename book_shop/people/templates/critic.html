@@ -1,70 +1,122 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% load book_filters %}
+{% load people_filters %}
 
-{% block title %}{{ book.title }}{% endblock %}
+{% block title %}{{ critic.name }}{% endblock %}
 
 
 {% block custom_css %}
-<link rel="stylesheet" href="{% static 'css/book.css' %}">
+<link rel="stylesheet" href="{% static 'css/person.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">"{{ book.title }}"</h1>
+    <h1 class="text-center mb-4">{{ critic.name }}</h1>
 
     <div class="card shadow-sm mb-4">
         <div class="row g-0">
-            <!-- Book Details -->
+            <!-- Critic Details -->
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title"><strong>Details</strong></h5>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Author:</strong> <a
-                            href="{% url 'author-detail' book.author.id %}">{{ book.author.name }}</a></p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Date Published:</strong>
-                        {{ book.date_published }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Age:</strong> {{ book.age }} years</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>ISBN:</strong> {{ book.isbn }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Pages:</strong> {{ book.pages }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Language:</strong> {{ book.language }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Rating:</strong> {{ book.rating }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Reviews Number:</strong>
-                        {{ book.review_num }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Views Count:</strong>
-                        {{ book.view_count }}</p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>First Name:</strong> {{ critic.first_name }}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Last Name:</strong> {{ critic.last_name }}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Birth Date:</strong>
+                        {{ critic.birth_date }}</p>
+                    {% if critic.death_date %}
+                    <p class="card-text" style="margin-left: 20px;"><strong>Death Date:</strong> {{ critic.death_date }}
+                        years</p>
+                    {% else %}
+                    <p class="card-text" style="margin-left: 20px;"><strong>Age:</strong> {{ critic.age }} years</p>
+                    {% endif %}
+                    <p class="card-text" style="margin-left: 20px;"><strong>Nationality:</strong>
+                        {% if critic.nationality %}
+                        {{ critic.nationality }}
+                        {% else %}
+                        <span class="text-muted">
+                            Unknown
+                        </span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Website:</strong>
+                        {% if critic.website %}
+                        <a href="{{ critic.website }}">
+                            {{ critic.website }}
+                        </a>
+                        {% else %}
+                        <span class="text-muted">
+                            No website available
+                        </span>
+                        {% endif %}
+                    </p>
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>View Count:</strong>
+                        {{ critic.view_count }}</p>
+                    <p class="card-text" style="margin-left: 20px;"><strong>Expertise Area:</strong>
+                        {{ critic.expertise_area }}</p>
                 </div>
             </div>
 
-            <!-- Book Cover Image -->
+            <!-- Critic Image -->
             <div class="col-md-4 text-center">
-                {% if book.cover_image %}
-                <img src="{{ book.cover_image.url }}" class="img-fluid rounded-start p-4" alt="Book Cover"
+                {% if critic.photo %}
+                <img src="{{ critic.photo.url }}" class="img-fluid rounded-start p-4" alt="Critic Photo"
                     style="max-height: 400px; object-fit: cover;">
                 {% else %}
-                <img src="{% static 'book.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Book Cover"
+                <img src="{% static 'critic.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Critic Photo"
                     style="max-height: 400px; object-fit: cover;">
                 {% endif %}
             </div>
         </div>
     </div>
 
+    <!-- Details Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><strong>Critic's reviews summary</strong></h5>
+            {% if critic.total_activity > 0 %}
+            <p class="card-text" style="margin-left: 20px;"><strong>Publications Number:</strong>
+                {{ critic.total_activity }}
+            <p class="card-text" style="margin-left: 20px;"><strong>First Publication Date:</strong>
+                {{ critic.date_first_review }} </p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Last Publication Date:</strong>
+                {{ critic.date_last_review }} </p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Career Span:</strong>
+                {{ critic.career_span }} {% if critic.career_span == 1 %}year{% else %}years{% endif %}</p>
+            <p class="card-text" style="margin-left: 20px;"><strong>Mostly liked review:</strong> <a
+                    href="#review-{{ critic.mostly_liked_review.id }}">
+                    Review on {{ critic.mostly_liked_review.content_object }}</p></a>
+            <p class="card-text" style="margin-left: 20px;"><strong>Mostly disliked review:</strong> <a
+                    href="#review-{{ critic.mostly_disliked_review.id }}">
+                    Review on {{ critic.mostly_disliked_review.content_object }}</p></a>
+            </p>
+            {% else %}
+            <p class="card-text" style="margin-left: 20px;">This critic hasn't revieved anything
+                {% if not critic.death_date %} yet{% endif %}.</p>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- Summary Card -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h5 class="card-title"><strong>Summary</strong></h5>
-            <p class="card-text">{{ book.summary }}</p>
+            <h5 class="card-title"><strong>Critic's short story</strong></h5>
+            <p class="card-text">{{ critic.description }}</p>
         </div>
     </div>
 
     <!-- Reviews Card -->
     <div class="card shadow-sm mb-4">
         <div class="card-body position-relative">
-            <h5 class="card-title mb-4"><strong>Reviews</strong></h5>
+            <h5 class="card-title mb-4"><strong>Critic's Reviews</strong></h5>
 
             {% if user.is_authenticated %}
-            {% for review in book.reviews %}
-            <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;">
+            {% for review in critic.reviews.all %}
+            <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;"
+                id="review-{{ review.id }}">
                 {% if review.starred %}
                 <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="#ffc107"
                     class="bi bi-star-fill star-icon" viewBox="0 0 16 16"
@@ -123,21 +175,21 @@
                 </div>
             </div>
             {% empty %}
-            <p class="text-center">No reviews available for this book.</p>
+            <p class="text-center">No reviews available for this critic.</p>
             {% endfor %}
             {% else %}
-            <p class="text-center">You need to be <a href="{% url 'login' %}">logged in</a> to see the reviews.</p>
+            <p class="text-center">You need to be <a href="{% url 'login' %}">logged in</a> to see author's reviews.</p>
             {% endif %}
         </div>
     </div>
 
     <div class="text-center mt-4">
-        <a href="{% url 'book-list' %}" class="btn btn-primary">Back to Books List</a>
+        <a href="{% url 'critic-list' %}" class="btn btn-primary">Back to Critics List</a>
     </div>
 </div>
 
 {% endblock %}
 
 {% block custom_js %}
-<script src="{% static 'js/book.js' %}" defer></script>
+<script src="{% static 'js/person.js' %}" defer></script>
 {% endblock %}

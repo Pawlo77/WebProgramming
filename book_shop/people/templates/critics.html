@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% load static %}
 
-{% block title %}Authors{% endblock %}
+{% block title %}Critics{% endblock %}
 
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'css/people.css' %}">
@@ -11,7 +11,7 @@
 {% block content %}
 
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Authors List</h1>
+    <h1 class="text-center mb-4">Critics List</h1>
 
     <form method="get" class="mb-4">
         <div class="card shadow-lg border-0 rounded-lg">
@@ -31,22 +31,18 @@
                     <th>Name</th>
                     <th>Popularity</th>
                     <th>Publications Number</th>
-                    <th>Awards Number</th>
-                    <th>Most popular book</th>
                 </tr>
             </thead>
             <tbody>
-                {% for author in authors %}
-                <tr class="clickable-row" data-href="{% url 'author-detail' author.pk %}">
-                    <td>{{ author.name }}</td>
-                    <td>{{ author.popularity|floatformat:2 }}</td>
-                    <td>{{ author.publications_num }}</td>
-                    <td>{{ author.awards_num }}</td>
-                    <td>{{ author.mostly_viewed_book }}</td>
+                {% for critic in critics %}
+                <tr class="clickable-row" data-href="{% url 'critic-detail' critic.pk %}">
+                    <td>{{ critic.name }}</td>
+                    <td>{{ critic.popularity|floatformat:2 }}</td>
+                    <td>{{ critic.publications_num }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">No authors found.</td>
+                    <td colspan="6" class="text-center">No critics found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

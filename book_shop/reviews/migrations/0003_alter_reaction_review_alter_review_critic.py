@@ -7,19 +7,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('people', '0003_remove_author_people_auth_first_p_f95cca_idx_and_more'),
-        ('reviews', '0002_initial'),
+        ("people", "0003_remove_author_people_auth_first_p_f95cca_idx_and_more"),
+        ("reviews", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='reaction',
-            name='review',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reactions', to='reviews.review'),
+            model_name="reaction",
+            name="review",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reactions",
+                to="reviews.review",
+            ),
         ),
         migrations.AlterField(
-            model_name='review',
-            name='critic',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='people.critic'),
+            model_name="review",
+            name="critic",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="reviews",
+                to="people.critic",
+            ),
         ),
     ]

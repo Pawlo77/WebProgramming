@@ -8,33 +8,43 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('items', '0003_initial'),
-        ('people', '0003_remove_author_people_auth_first_p_f95cca_idx_and_more'),
+        ("items", "0003_initial"),
+        ("people", "0003_remove_author_people_auth_first_p_f95cca_idx_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RemoveIndex(
-            model_name='book',
-            name='items_book_publish_dfdeae_idx',
+            model_name="book",
+            name="items_book_publish_dfdeae_idx",
         ),
         migrations.RenameField(
-            model_name='book',
-            old_name='published_date',
-            new_name='date_published',
+            model_name="book",
+            old_name="published_date",
+            new_name="date_published",
         ),
         migrations.AlterField(
-            model_name='award',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='author', to='people.author'),
+            model_name="award",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="author",
+                to="people.author",
+            ),
         ),
         migrations.AlterField(
-            model_name='book',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='books', to='people.author'),
+            model_name="book",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="books",
+                to="people.author",
+            ),
         ),
         migrations.AddIndex(
-            model_name='book',
-            index=models.Index(fields=['date_published'], name='items_book_date_pu_0df277_idx'),
+            model_name="book",
+            index=models.Index(
+                fields=["date_published"], name="items_book_date_pu_0df277_idx"
+            ),
         ),
     ]

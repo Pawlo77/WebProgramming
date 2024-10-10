@@ -7,51 +7,165 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Author',
+            name="Author",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True, help_text='Brief biography or description.', null=True)),
-                ('birth_date', models.DateField(help_text='Birth date.')),
-                ('death_date', models.DateField(blank=True, help_text='Death date, if applicable.', null=True)),
-                ('nationality', models.CharField(blank=True, help_text='Nationality or country of origin.', max_length=100, null=True)),
-                ('website', models.URLField(blank=True, help_text="Author's official website or portfolio link.", null=True)),
-                ('photo', models.ImageField(blank=True, help_text="Author's photograph.", null=True, upload_to='author_photos/')),
-                ('view_count', models.PositiveIntegerField(blank=True, default=0, help_text='Number of times the person has been viewed on the website.')),
-                ('first_publication_date', models.DateField(blank=True, help_text='First publication date.', null=True)),
-                ('last_publication_date', models.DateField(blank=True, help_text='Last publication date.', null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Brief biography or description.",
+                        null=True,
+                    ),
+                ),
+                ("birth_date", models.DateField(help_text="Birth date.")),
+                (
+                    "death_date",
+                    models.DateField(
+                        blank=True, help_text="Death date, if applicable.", null=True
+                    ),
+                ),
+                (
+                    "nationality",
+                    models.CharField(
+                        blank=True,
+                        help_text="Nationality or country of origin.",
+                        max_length=100,
+                        null=True,
+                    ),
+                ),
+                (
+                    "website",
+                    models.URLField(
+                        blank=True,
+                        help_text="Author's official website or portfolio link.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "photo",
+                    models.ImageField(
+                        blank=True,
+                        help_text="Author's photograph.",
+                        null=True,
+                        upload_to="author_photos/",
+                    ),
+                ),
+                (
+                    "view_count",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        default=0,
+                        help_text="Number of times the person has been viewed on the website.",
+                    ),
+                ),
+                (
+                    "first_publication_date",
+                    models.DateField(
+                        blank=True, help_text="First publication date.", null=True
+                    ),
+                ),
+                (
+                    "last_publication_date",
+                    models.DateField(
+                        blank=True, help_text="Last publication date.", null=True
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Authors',
+                "verbose_name_plural": "Authors",
             },
         ),
         migrations.CreateModel(
-            name='Critic',
+            name="Critic",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date_created', models.DateTimeField(auto_now_add=True)),
-                ('date_updated', models.DateTimeField(auto_now=True)),
-                ('first_name', models.CharField(max_length=100)),
-                ('last_name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True, help_text='Brief biography or description.', null=True)),
-                ('birth_date', models.DateField(help_text='Birth date.')),
-                ('death_date', models.DateField(blank=True, help_text='Death date, if applicable.', null=True)),
-                ('nationality', models.CharField(blank=True, help_text='Nationality or country of origin.', max_length=100, null=True)),
-                ('website', models.URLField(blank=True, help_text="Author's official website or portfolio link.", null=True)),
-                ('photo', models.ImageField(blank=True, help_text="Author's photograph.", null=True, upload_to='author_photos/')),
-                ('view_count', models.PositiveIntegerField(blank=True, default=0, help_text='Number of times the person has been viewed on the website.')),
-                ('expertise_area', models.CharField(help_text="Critic's area of expertise.", max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date_created", models.DateTimeField(auto_now_add=True)),
+                ("date_updated", models.DateTimeField(auto_now=True)),
+                ("first_name", models.CharField(max_length=100)),
+                ("last_name", models.CharField(max_length=100)),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Brief biography or description.",
+                        null=True,
+                    ),
+                ),
+                ("birth_date", models.DateField(help_text="Birth date.")),
+                (
+                    "death_date",
+                    models.DateField(
+                        blank=True, help_text="Death date, if applicable.", null=True
+                    ),
+                ),
+                (
+                    "nationality",
+                    models.CharField(
+                        blank=True,
+                        help_text="Nationality or country of origin.",
+                        max_length=100,
+                        null=True,
+                    ),
+                ),
+                (
+                    "website",
+                    models.URLField(
+                        blank=True,
+                        help_text="Author's official website or portfolio link.",
+                        null=True,
+                    ),
+                ),
+                (
+                    "photo",
+                    models.ImageField(
+                        blank=True,
+                        help_text="Author's photograph.",
+                        null=True,
+                        upload_to="author_photos/",
+                    ),
+                ),
+                (
+                    "view_count",
+                    models.PositiveIntegerField(
+                        blank=True,
+                        default=0,
+                        help_text="Number of times the person has been viewed on the website.",
+                    ),
+                ),
+                (
+                    "expertise_area",
+                    models.CharField(
+                        help_text="Critic's area of expertise.", max_length=255
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Critics',
+                "verbose_name_plural": "Critics",
             },
         ),
     ]

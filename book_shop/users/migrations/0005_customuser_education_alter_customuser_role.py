@@ -6,18 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_alter_customuser_role'),
+        ("users", "0004_alter_customuser_role"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customuser',
-            name='education',
-            field=models.CharField(blank=True, choices=[('uneducated', 'Uneducated'), ('primary', 'Primary'), ('middle', 'MIDDLE'), ('high', 'High')], max_length=10, null=True),
+            model_name="customuser",
+            name="education",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("uneducated", "Uneducated"),
+                    ("primary", "Primary"),
+                    ("middle", "MIDDLE"),
+                    ("high", "High"),
+                ],
+                max_length=10,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='customuser',
-            name='role',
-            field=models.CharField(blank=True, choices=[('user', 'User'), ('manager', 'Manager'), ('admin', 'Admin')], default='user', max_length=10),
+            model_name="customuser",
+            name="role",
+            field=models.CharField(
+                blank=True,
+                choices=[("user", "User"), ("manager", "Manager"), ("admin", "Admin")],
+                default="user",
+                max_length=10,
+            ),
         ),
     ]
