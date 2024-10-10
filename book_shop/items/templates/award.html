@@ -5,7 +5,6 @@
 
 {% block title %}{{ award.name }}{% endblock %}
 
-
 {% block custom_css %}
 <link rel="stylesheet" href="{% static 'css/book.css' %}">
 {% endblock %}
@@ -16,49 +15,58 @@
 
     <div class="card shadow-sm mb-4">
         <div class="row g-0">
-            <!-- Book Details -->
+            <!-- Award Details -->
             <div class="col-md-8">
                 <div class="card-body">
                     <h5 class="card-title"><strong>Details</strong></h5>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Name:</strong> {{ award.name }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Year awarded:</strong>
-                        {{ award.year_awarded }}</p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Reciever:</strong> <a
-                            href="{% url 'author-detail' award.author.id %}">{{ award.author.name }}</a></p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Website:</strong>
-                        {% if award.website %}
-                        <a href="{{ award.website }}">
-                            {{ award.website }}
-                        </a>
+                    <p class="card-text" style="margin-left: 20px;">
+                        <strong>Name:</strong> {{ award.name }}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;">
+                        <strong>Year awarded:</strong> {{ award.year_awarded|default:"N/A" }}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;">
+                        <strong>Receiver:</strong>
+                        {% if award.author %}
+                            <a href="{% url 'author-detail' award.author.id %}">{{ award.author.name }}</a>
                         {% else %}
-                        <span class="text-muted">
-                            No website available
-                        </span>
+                            <span class="text-muted">No author available</span>
                         {% endif %}
                     </p>
-                    <p class="card-text" style="margin-left: 20px;"><strong>Views Count:</strong>
-                        {{ award.view_count }}</p>
+                    <p class="card-text" style="margin-left: 20px;">
+                        <strong>Website:</strong>
+                        {% if award.website %}
+                            <a href="{{ award.website }}" target="_blank" rel="noopener noreferrer">{{ award.website }}</a>
+                        {% else %}
+                            <span class="text-muted">No website available</span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text" style="margin-left: 20px;">
+                        <strong>Views Count:</strong> {{ award.view_count|default:0 }}
+                    </p>
                 </div>
             </div>
 
-            <!-- Book Cover Image -->
+            <!-- Award Photo -->
             <div class="col-md-4 text-center">
-                {% if award.image %}
-                <img src="{{ award.photo.url }}" class="img-fluid rounded-start p-4" alt="Award Photo"
-                    style="max-height: 400px; object-fit: cover;">
+                {% if award.photo %}
+                    <img src="{{ award.photo.url }}" class="img-fluid rounded-start p-4" alt="Award Photo" style="max-height: 400px; object-fit: cover;">
                 {% else %}
-                <img src="{% static 'award.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Award Photo"
-                    style="max-height: 400px; object-fit: cover;">
+                    <img src="{% static 'award.jpeg' %}" class="img-fluid rounded-start p-4" alt="Default Award Photo" style="max-height: 400px; object-fit: cover;">
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Summary Card -->
+    <!-- Description Card -->
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <h5 class="card-title"><strong>Description</strong></h5>
-            <p class="card-text">{{ award.description }}</p>
+            {% if award.description %}
+                <p class="card-text">{{ award.description }}</p>
+            {% else %}
+                <p class="card-text text-muted">No description available.</p>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -11,14 +11,17 @@ from utils.models import Item
 
 
 class Award(Item):
-    """Award given to Author"""
+    """Model representing an award given to an author."""
 
-    # Basic information
+    # Basic information about the award
     name = models.CharField(
-        null=False, blank=False, max_length=255, help_text="Name of the award."
+        max_length=255,
+        help_text="Name of the award.",
     )
     description = models.TextField(
-        blank=True, null=True, help_text="Description or significance of the award."
+        blank=True,
+        null=True,
+        help_text="Description or significance of the award.",
     )
     year_awarded = models.IntegerField(
         help_text="Year the award was received.",
@@ -30,13 +33,14 @@ class Award(Item):
         Author,
         on_delete=models.CASCADE,
         related_name="awards",
-        null=False,
-        blank=False,
+        help_text="Author who received the award.",
     )
 
-    # Additional information
+    # Additional information about the award
     website = models.URLField(
-        blank=True, null=True, help_text="Award's official website link."
+        blank=True,
+        null=True,
+        help_text="Award's official website link.",
     )
     photo = models.ImageField(
         upload_to="award_photos/",
@@ -45,7 +49,7 @@ class Award(Item):
         help_text="Award's photograph.",
     )
 
-    # View Count
+    # View count for the award
     view_count = models.PositiveIntegerField(
         default=0,
         blank=True,
@@ -53,7 +57,7 @@ class Award(Item):
         help_text="Number of times the award has been viewed on the website.",
     )
 
-    # Auto-generated fields
+    # Auto-generated fields for tracking
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -93,14 +97,11 @@ class Award(Item):
             return current_year - self.year_awarded
         return None
 
-    def __str__(self):
-        return f"Award {self.name} ({self.year_awarded}) for {self.author.name}"
-
 
 class Book(Item):
-    """Book model"""
+    """Model representing a book."""
 
-    # Basic information
+    # Basic information about the book
     title = models.CharField(max_length=200, null=False, blank=False)
     author = models.ForeignKey(
         Author,
@@ -120,13 +121,13 @@ class Book(Item):
         validators=[MinValueValidator(0), MaxValueValidator(5)],
     )
 
-    # Technical information
+    # Technical information about the book
     pages = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     language = models.CharField(max_length=30, null=False, blank=False)
     isbn = models.CharField(max_length=13, unique=True, null=False, blank=False)
     date_published = models.DateField(null=False, blank=False)
 
-    # Auto-generated fields
+    # Auto-generated fields for tracking
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -143,10 +144,7 @@ class Book(Item):
     )
 
     class Meta:
-        unique_together = (
-            "title",
-            "author",
-        )
+        unique_together = ("title", "author")
         verbose_name_plural = "Books"
         indexes = [
             models.Index(fields=["author"]),
@@ -165,13 +163,13 @@ class Book(Item):
 
     @property
     def review_num(self):
-        """Calculate the number of reviews."""
+        """Calculate the number of reviews for the book."""
         book_ct = ContentType.objects.get_for_model(Book)
         return Review.objects.filter(content_type=book_ct, object_id=self.id).count()
 
     @property
     def reviews(self):
-        """Calculate the number of reviews."""
+        """Get reviews for the book, including likes and dislikes."""
         book_ct = ContentType.objects.get_for_model(Book)
         return (
             Review.objects.filter(content_type=book_ct, object_id=self.id)
