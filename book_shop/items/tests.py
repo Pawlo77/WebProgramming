@@ -167,7 +167,7 @@ class BookModelTest(TestCase):
 
     def test_str_representation(self):
         """Test the string representation of the book."""
-        expected_str = "Fantastic Tales by Alice Smith"
+        expected_str = '"Fantastic Tales" by Alice Smith'
         self.assertEqual(str(self.book), expected_str)
 
     def test_unique_constraint(self):

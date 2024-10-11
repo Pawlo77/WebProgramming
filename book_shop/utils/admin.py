@@ -1,4 +1,3 @@
-
 readonly_fields = (
     "created_by",
     "date_created",

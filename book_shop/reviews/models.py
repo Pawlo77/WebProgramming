@@ -1,10 +1,10 @@
-
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
-from people.models import Critic
+from people.models import Author, Critic
 from users.models import CustomUser
 from utils.models import Item
 
@@ -88,6 +88,19 @@ class Review(Item):
     def net_likes(self):
         """Return net likes (likes - dislikes) for the review."""
         return self.like_count - self.dislike_count
+
+    @property
+    def review_object(self):
+        """Returns review's object"""
+        from items.models import Book
+
+        if self.content_type == ContentType.objects.get_for_model(Book):
+            book = Book.objects.filter(id=self.object_id).first()
+            book.url = reverse("book-detail", args=[book.pk])
+            return book
+        author = Author.objects.filter(id=self.object_id).first()
+        author.url = reverse("author-detail", args=[author.pk])
+        return author
 
     def add_like(self, user):
         """Add a like reaction to the review by a user."""

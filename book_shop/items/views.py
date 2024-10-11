@@ -1,5 +1,5 @@
-
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models.functions import Round
 from django.views.generic import DetailView, ListView
 
 from .forms import BookFilterForm
@@ -103,7 +103,10 @@ class BookListView(ListView):
         if language:
             queryset = queryset.filter(language__icontains=language)
         if rating:
-            queryset = queryset.filter(rating=rating)
+            rating = float(rating)
+            queryset = queryset.annotate(rounded_rating=Round("rating", 0)).filter(
+                rounded_rating=rating
+            )
 
         return queryset
 

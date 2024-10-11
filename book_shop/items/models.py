@@ -161,7 +161,7 @@ class Book(Item):
         ]
 
     def __str__(self):
-        return f"{self.title} by {self.author.name}"
+        return f'"{self.title}" by {self.author.name}'
 
     @property
     def age(self):
@@ -206,5 +206,5 @@ class Book(Item):
                 ),
                 query_net_likes=F("query_likes_count") - F("query_dislikes_count"),
             )
-            .order_by("-starred", "-query_net_likes")
+            .order_by("-starred", "-query_likes_count", "-query_net_likes")
         )

@@ -246,7 +246,7 @@ class Author(Person):
                 ),
                 query_net_likes=F("query_likes_count") - F("query_dislikes_count"),
             )
-            .order_by("-starred", "-query_net_likes")
+            .order_by("-starred", "-query_net_likes", "-query_likes_count")
         )
 
     def __str__(self):
@@ -402,7 +402,7 @@ class Critic(Person):
                 )
             ),
             query_net_likes=F("query_likes_count") - F("query_dislikes_count"),
-        ).order_by("-starred", "-query_net_likes")
+        ).order_by("-starred", "-query_net_likes", "-query_likes_count")
 
     def __str__(self):
         return f"Critic {self.first_name} {self.last_name}"

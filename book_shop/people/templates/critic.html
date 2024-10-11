@@ -117,6 +117,7 @@
             {% for review in critic.ordered_reviews %}
             <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;"
                 id="review-{{ review.id }}">
+
                 {% if review.starred %}
                 <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" fill="#ffc107"
                     class="bi bi-star-fill star-icon" viewBox="0 0 16 16"
@@ -126,7 +127,7 @@
                 </svg>
                 {% endif %}
 
-                <p class="card-text"><strong>{{ review.critic.name }}</strong> - <span class="text-muted">
+                <p class="card-text"><strong>{{ review.critic.name }}</strong> revieved <a href="{{ review.review_object.url }}"><strong>{{ review.review_object }}</strong></a> - <span class="text-muted">
                         {{ review.date_created|date:"F j, Y" }}</span></p>
                 <p class="card-text">{{ review.content }}</p>
 

@@ -20,12 +20,27 @@ educations = [
     CustomUser.HIGH,
 ]
 
+# Use sets to track unique usernames and emails
+unique_usernames = set()
+unique_emails = set()
+
 users = []
-for _ in range(10):
+for _ in range(100):
     username = fake.user_name()
+    # Ensure unique username
+    while username in unique_usernames:
+        username = fake.user_name()
+    unique_usernames.add(username)
+
     first_name = fake.first_name()
     last_name = fake.last_name()
+
     email = fake.email()
+    # Ensure unique email
+    while email in unique_emails:
+        email = fake.email()
+    unique_emails.add(email)
+
     password = "Pass123!"
     role = random.choice(roles)
     education = random.choice(educations)
@@ -44,9 +59,10 @@ for _ in range(10):
     custom_user.save()
     users.append(custom_user)
 
+print("Generated 100 users successfully.")
 
 authors = []
-for _ in range(5):
+for _ in range(20):
     author = Author(
         first_name=fake.first_name(),
         last_name=fake.last_name(),
@@ -55,13 +71,15 @@ for _ in range(5):
         nationality=fake.country(),
         website=fake.url(),
         photo="/static/logo.png",
-        created_by=User.objects.first(),
+        created_by=random.choice(users),
     )
     author.save()
     authors.append(author)
 
+print("Generated 20 authors successfully.")
+
 critics = []
-for _ in range(5):
+for _ in range(30):
     critic = Critic(
         first_name=fake.first_name(),
         last_name=fake.last_name(),
@@ -71,14 +89,16 @@ for _ in range(5):
         nationality=fake.country(),
         website=fake.url(),
         photo=None,
-        created_by=User.objects.first(),
+        created_by=random.choice(users),
     )
-    critic.save()  #
+    critic.save()
     critics.append(critic)
+
+print("Generated 30 critics successfully.")
 
 books = []
 for author in authors:
-    for _ in range(3):
+    for _ in range(5):
         book = Book(
             title=fake.sentence(nb_words=3),
             author=author,
@@ -86,51 +106,68 @@ for author in authors:
             isbn=fake.isbn13(),
             pages=fake.random_int(min=100, max=500),
             language=fake.language_name(),
-            summary=fake.paragraph(),
+            summary=[
+                "\n".join(fake.paragraph() for _ in range(1, random.randint(1, 10)))
+            ],
             rating=random.uniform(0.0, 5.0),
-            created_by=User.objects.first(),
+            created_by=random.choice(users),
         )
         book.save()
         books.append(book)
 
-for author in authors[:2]:
-    for _ in range(2):
+print("Generated books successfully.")
+
+for i in range(random.randint(len(authors) // 3, len(authors))):
+    author = authors[i]
+    for _ in range(random.randint(1, 6)):
         award = Award(
             name=fake.word().capitalize() + " Award",
-            description=fake.paragraph(),
+            description=[
+                "\n".join(fake.paragraph() for _ in range(1, random.randint(1, 10)))
+            ],
             year_awarded=random.randint(2000, date.today().year),
             author=author,
-            created_by=User.objects.first(),
+            created_by=random.choice(users),
         )
         award.save()
 
+print("Generated awards successfully.")
+
 reviews = []
-for author in authors[:2]:
+for i in range(random.randint(len(authors) // 3, len(authors))):
+    author = authors[i]
     for critic in critics:
         review = Review(
             content_type=ContentType.objects.get_for_model(Author),
             object_id=author.id,
-            content=f"This is a review for {author.name}.",
+            content=f"This is a review for {author.first_name} {author.last_name}."
+            + fake.paragraph(),
             critic=critic,
-            created_by=User.objects.first(),
+            created_by=random.choice(users),
         )
         review.save()
         reviews.append(review)
-for book in books[:3]:
+
+print("Generated reviews for authors successfully.")
+
+for i in range(random.randint(len(books) // 3, len(books))):
+    book = books[i]
     for critic in critics:
         review = Review(
             content_type=ContentType.objects.get_for_model(Book),
             object_id=book.id,
             content=f"This is a review for the book '{book.title}'.",
             critic=critic,
-            created_by=User.objects.first(),
+            created_by=random.choice(users),
         )
         review.save()
         reviews.append(review)
 
+print("Generated reviews for books successfully.")
 
 for review in reviews:
-    for user in users[:3]:
+    for i in range(random.randint(len(users) // 3, len(users))):
+        user = users[i]
         reaction = Reaction(
             review=review,
             reaction_type=random.choice(
@@ -140,4 +177,6 @@ for review in reviews:
         )
         reaction.save()
 
-print("Data generated successfully.")
+print("Generated reactions successfully.")
+
+print("Data generation completed successfully.")
