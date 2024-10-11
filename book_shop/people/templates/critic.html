@@ -114,7 +114,7 @@
             <h5 class="card-title mb-4"><strong>Critic's Reviews</strong></h5>
 
             {% if user.is_authenticated %}
-            {% for review in critic.reviews.all %}
+            {% for review in critic.ordered_reviews %}
             <div class="mb-4 mt-4 position-relative border p-3 pb-5 rounded" style="background-color: #f8f9fa;"
                 id="review-{{ review.id }}">
                 {% if review.starred %}

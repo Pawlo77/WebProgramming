@@ -1,17 +1,14 @@
 from datetime import date
 
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 from items.models import Book
 from people.models import Critic
 from users.models import CustomUser
 
 from .models import Reaction, Review
-from .views import DislikeView, LikeView
 
 
 class ReviewModelTest(TestCase):

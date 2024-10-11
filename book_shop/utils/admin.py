@@ -1,4 +1,3 @@
-from django.contrib import admin
 
 readonly_fields = (
     "created_by",

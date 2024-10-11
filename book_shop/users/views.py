@@ -3,8 +3,11 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import (
     LoginView,
+    PasswordChangeDoneView,
     PasswordChangeView,
+    PasswordResetCompleteView,
     PasswordResetConfirmView,
+    PasswordResetDoneView,
     PasswordResetView,
 )
 from django.shortcuts import redirect, render
@@ -114,6 +117,18 @@ class CustomLoginView(LoginView):
         return context
 
 
+class CustomPasswordChangeDoneView(PasswordChangeDoneView):
+    template_name = "success.html"
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "success.html"
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = "success.html"
+
+
 class CustomPasswordResetView(PasswordResetView):
     template_name = "form.html"
     form_class = CustomPasswordResetForm
@@ -131,7 +146,7 @@ class CustomPasswordResetView(PasswordResetView):
             self.request,
             "Email with information about password reset was successfully sent.",
         )
-        return redirect("password_reset_done")
+        return redirect("login")
 
 
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
@@ -147,6 +162,13 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
         super().form_valid(form)
         messages.success(self.request, "Your password has been successfully reset.")
         return redirect("login")
+
+        # Check if the link (token) is valid or not
+        response = super().dispatch(request, *args, **kwargs)
+        if not self.validlink:
+            messages.error(self.request, "The password reset link is no longer valid.")
+            return render(request, "home.html")
+        return response
 
 
 class CustomPasswordChangeView(PasswordChangeView):

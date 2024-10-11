@@ -1,11 +1,6 @@
-import json
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, ListView
-from reviews.models import Reaction, Review
 
 from .forms import BookFilterForm
 from .models import Award, Book

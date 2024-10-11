@@ -2,13 +2,10 @@
 
 from datetime import date, timedelta
 
-from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.contrib.messages import get_messages
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from .forms import CustomUserCreationForm, UserUpdateForm

@@ -1,7 +1,6 @@
 from datetime import date
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout, Submit
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from people.models import Author
@@ -56,7 +55,7 @@ class BookFilterForm(forms.Form):
 
     rating = forms.ChoiceField(
         choices=[
-            ("", "All"),
+            ("", "---------"),
             ("1", "1 Star"),
             ("2", "2 Stars"),
             ("3", "3 Stars"),

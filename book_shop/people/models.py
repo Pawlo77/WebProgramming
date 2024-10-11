@@ -377,5 +377,32 @@ class Critic(Person):
         )
         return min((self.view_count / max_views) * 10, 10)
 
+    @property
+    def ordered_reviews(self):
+        """
+        Returns all reviews related to this critic, annotated with like and dislike counts.
+        Reviews are sorted by 'starred' status and net likes (likes minus dislikes).
+        """
+        from reviews.models import Reaction
+
+        return self.reviews.annotate(
+            query_likes_count=Count(
+                Case(
+                    When(reactions__reaction_type=Reaction.ReactionType.LIKE, then=1),
+                    output_field=IntegerField(),
+                )
+            ),
+            query_dislikes_count=Count(
+                Case(
+                    When(
+                        reactions__reaction_type=Reaction.ReactionType.DISLIKE,
+                        then=1,
+                    ),
+                    output_field=IntegerField(),
+                )
+            ),
+            query_net_likes=F("query_likes_count") - F("query_dislikes_count"),
+        ).order_by("-starred", "-query_net_likes")
+
     def __str__(self):
         return f"Critic {self.first_name} {self.last_name}"

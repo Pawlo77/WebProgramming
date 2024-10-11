@@ -9,7 +9,7 @@ from users.models import CustomUser
 
 from .forms import BookFilterForm
 from .models import Award, Book
-from .views import AwardDetailView, BookDetailView, BookListView
+from .views import AwardDetailView, BookDetailView
 
 
 class AwardModelTest(TestCase):

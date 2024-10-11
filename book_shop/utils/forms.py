@@ -2,7 +2,6 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import EmailValidator
-from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
 

@@ -82,7 +82,7 @@ class AuthorFilterForm(BaseFilterForm):
         """Initialize the author form and set nationality choices."""
         super().__init__(*args, **kwargs)
         # Set nationality choices dynamically based on distinct values from Author model
-        self.fields["nationality"].choices = [
+        self.fields["nationality"].choices = [("", "---------")] + [
             (nationality, nationality)
             for nationality in Author.objects.values_list("nationality", flat=True)
             .distinct()
@@ -97,7 +97,7 @@ class CriticFilterForm(BaseFilterForm):
         """Initialize the critic form and set nationality choices."""
         super().__init__(*args, **kwargs)
         # Set nationality choices dynamically based on distinct values from Critic model
-        self.fields["nationality"].choices = [
+        self.fields["nationality"].choices = [("", "---------")] + [
             (nationality, nationality)
             for nationality in Critic.objects.values_list("nationality", flat=True)
             .distinct()

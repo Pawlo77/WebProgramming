@@ -16,11 +16,10 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, re_path
-from django.views.generic import RedirectView
+from django.views.static import serve
 from utils.views import ContactUsView, about_view, home_view
 
 urlpatterns = [
@@ -31,12 +30,16 @@ urlpatterns = [
     path("items/", include("items.urls")),
     path("reviews/", include("reviews.urls")),
     path("people/", include("people.urls")),
+    #
     # system
     path(
         "admin/password_change/",
         lambda request: redirect("/users/password_change/", permanent=True),
     ),
     path("admin/", admin.site.urls),
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    re_path(r"^static/(?P<path>.*)$", serve, {"document_root": settings.STATIC_ROOT}),
+    #
     # 3rd party
-    re_path(r"^i18n/", include("django.conf.urls.i18n")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # re_path(r"^i18n/", include("django.conf.urls.i18n")),
+]

@@ -1,7 +1,5 @@
-from datetime import date
 
 from django.db import models
-from users.models import CustomUser
 
 
 class Item(models.Model):
