@@ -1,5 +1,7 @@
 # WebProgramming
-Programming of WWW Applications course for DS studies in Winter 2024/25
+Programming of WWW Applications course for DS studies in Winter 2024/25.
+
+Details are available in [raport](/raport/raport.pdf).
 
 # Project Requirements
 - allow users login and password reset
@@ -19,6 +21,15 @@ Programming of WWW Applications course for DS studies in Winter 2024/25
 
 # Project Deployment
 
+## Using docker
+
+```bash
+docker build -t "book-shop" .
+
+```
+
+## Natively
+
 ```bash
 
 # in the same dir as readme
@@ -29,6 +40,6 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic
 python manage.py shell < book_shop/generate_examples.py
-python manage.py runserver                           
+python manage.py runserver --insecure               
 
 ```
