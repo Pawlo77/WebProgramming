@@ -9,7 +9,7 @@ puppeteer:
     bottom: "2cm"
     right: "1.5cm"
     left: "1.5cm"
-  scale: 0.8
+  scale: 0.75
   displayHeaderFooter: true
   headerTemplate: |
     <div style="width: 100%; font-size: 10px; padding: 0 1.5cm; box-sizing: border-box;">
@@ -30,7 +30,7 @@ puppeteer:
     Warsaw University of Technology 
     </p>
 <p style="text-align: center;">
-    <i>Paweł Pozorski gr 4</i>
+    <i>Paweł Pozorski</i>
     <br/>
     <i>11.10.2024</i>
 </p>
