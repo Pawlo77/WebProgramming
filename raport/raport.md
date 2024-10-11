@@ -9,7 +9,7 @@ puppeteer:
     bottom: "2cm"
     right: "1.5cm"
     left: "1.5cm"
-  scale: 0.9
+  scale: 0.8
   displayHeaderFooter: true
   headerTemplate: |
     <div style="width: 100%; font-size: 10px; padding: 0 1.5cm; box-sizing: border-box;">
